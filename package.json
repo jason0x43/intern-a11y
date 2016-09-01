@@ -1,0 +1,33 @@
+{
+  "name": "intern-a11y",
+  "version": "0.0.1",
+  "description": "Intern-a11y. An accessibility testing helper for Intern.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theintern/intern-a11y.git"
+  },
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "@types/es6-promise": "0.0.31",
+    "@types/node": "^6.0.38",
+    "axe-core": "2.0.5"
+  },
+  "devDependencies": {
+    "intern": "3.2.3",
+	"shelljs": "0.7.4",
+	"typescript": "2.0.2"
+  },
+  "bugs": "https://github.com/theintern/intern-a11y/issues",
+  "keywords": [
+    "javascript",
+    "test",
+    "functional",
+    "tenon",
+    "aXe"
+  ],
+  "homepage": "http://github.com/theintern/intern-a11y",
+  "scripts": {
+	  "build": "node node_modules/.bin/tsc",
+	  "clean": "node ./support/clean.js"
+  }
+}
