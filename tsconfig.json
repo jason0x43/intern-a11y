@@ -1,12 +1,19 @@
 {
-	"compilerOptions": {
-		"module": "commonjs",
-		"noImplicitAny": true,
-		"removeComments": true,
-		"preserveConstEnums": true,
-		"outDir": "./build"
-	},
-	"include": [
-		"./src/**/*.ts"
-	]
+  "compilerOptions": {
+    "module": "umd",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "outDir": "./build"
+  },
+  "files": [
+    "./node_modules/intern/typings/intern/intern.d.ts",
+    "./node_modules/intern/typings/leadfoot/leadfoot.d.ts"
+  ],
+  "include": [
+    "./src/**/*.ts",
+    "./tests/**/*.ts"
+  ]
 }

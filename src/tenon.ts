@@ -1,6 +1,6 @@
-import * as https from 'https';
-import * as querystring from 'querystring';
-import * as fs from 'fs';
+import * as https from 'intern/dojo/has!host-node?intern/dojo/node!https';
+import * as querystring from 'intern/dojo/has!host-node?intern/dojo/node!querystring';
+import * as fs from 'intern/dojo/has!host-node?intern/dojo/node!fs';
 
 export interface TenonConfig {
 }
@@ -122,7 +122,7 @@ interface TenonQuery {
 	url?: string
 }
 
-export interface TestOptions {
+export interface TenonTestOptions {
 	source: string,
 
 	/** sourceType defaults to URL if not specified */
@@ -137,7 +137,7 @@ export interface TestOptions {
 	config?: TenonConfig,
 }
 
-export function run(options: TestOptions) {
+export function run(options: TenonTestOptions) {
 	return new Promise(function (resolve, reject) {
 		const tenonConfig = options.config;
 		let queryData: TenonQuery = {

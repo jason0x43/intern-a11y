@@ -17,6 +17,7 @@ function scheduleBuild() {
 
 var watcher = chokidar.watch([
 	'src/**/*.ts',
+	'tests/**/*.ts',
 	'package.json'
 ]).on('ready', function () {
 	console.log('Watching...');

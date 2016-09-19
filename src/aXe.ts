@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as Command from 'leadfoot/Command';
 
 export type AxeReporterVersion = 'v1' | 'v2';
 
@@ -58,7 +59,7 @@ export interface AxeResult {
 	}[]
 }
 
-export interface AxeResults {
+export interface AxeReport {
 	url: string,
 	timestamp: string,
 	passes: AxeResult[],
@@ -74,26 +75,26 @@ export interface AxePlugin {
 	}[]
 }
 
-export interface TestOptions {
+export interface AxeTestOptions {
 	baseUrl?: string,
 	report?: string,
 	config?: AxeConfig,
 	plugins?: AxePlugin[]
 }
 
-export function createRunner(testOptions?: TestOptions) {
-	return function () {
-		testOptions = testOptions || {};
-		const axeConfig = testOptions.config || null;
+export function createRunner(options?: AxeTestOptions) {
+	return function (this: Command<any>) {
+		options = options || {};
+		const axeConfig = options.config || null;
 		const axePath = require.resolve('axe-core/axe.min')
 		const axeScript = fs.readFileSync(axePath, { encoding: 'utf8' });
 
 		return this.parent
 			.getExecuteAsyncTimeout()
-			.then(function (timeout: number) {
+			.then(function (this: Command<any>, timeout: number) {
 				return this.parent
 					.setExecuteAsyncTimeout(30000)
-					.execute(axeScript)
+					.execute(axeScript, null)
 					.executeAsync(`return (function (config, done) {
 						if (config) {
 							axe.configure(config);
@@ -102,18 +103,21 @@ export function createRunner(testOptions?: TestOptions) {
 							done(results);
 						});
 					}).apply(this, arguments)`, [ axeConfig ])
-					.then(function (results: AxeResults) {
-						console.log('results:', results);
-						if (results.violations && results.violations.length > 0) {
-							throw new Error(results.violations.length + ' a11y violations were logged');
+					.then(function (report: AxeReport) {
+						if (options.report) {
+							fs.writeFileSync(options.report, JSON.stringify(report, null, '  '));
+						}
+
+						if (report.violations && report.violations.length > 0) {
+							throw new Error(report.violations.length + ' a11y violations were logged');
 						}
 					})
 					.then(
-						function () {
+						function (this: Command<void>) {
 							return this.parent
 								.setExecuteAsyncTimeout(timeout);
 						},
-						function (error: Error) {
+						function (this: Command<void>, error: Error) {
 							return this.parent
 								.setExecuteAsyncTimeout(timeout)
 								.then(function () {
