@@ -1,4 +1,4 @@
-import intern = require('intern');
+import * as intern from 'intern';
 
 export const capabilities = { name: 'intern-a11y' };
 
