@@ -94,7 +94,7 @@ export function createRunner(options?: AxeTestOptions) {
 			.then(function (this: Command<any>, timeout: number) {
 				return this.parent
 					.setExecuteAsyncTimeout(30000)
-					.execute(axeScript, null)
+					.execute(axeScript, [])
 					.executeAsync(`return (function (config, done) {
 						if (config) {
 							axe.configure(config);
