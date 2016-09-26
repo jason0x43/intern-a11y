@@ -136,8 +136,17 @@ export interface TenonTestOptions {
 export function run(options: TenonTestOptions) {
 	return new Promise(function (resolve, reject) {
 		const tenonConfig = options.config;
+
+		let apiKey = process.env['TENON_API_KEY'];
+		if (!apiKey && options.apiKey) {
+			apiKey = options.apiKey;
+		}
+		if (!apiKey) {
+			throw new Error('tenon requires an API key');
+		}
+
 		let queryData: TenonQuery = {
-			key: options.apiKey
+			key: apiKey
 		};
 
 		const source = options.source;
