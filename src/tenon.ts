@@ -1,6 +1,6 @@
-import * as https from 'intern/dojo/has!host-node?intern/dojo/node!https';
-import * as querystring from 'intern/dojo/has!host-node?intern/dojo/node!querystring';
-import * as fs from 'intern/dojo/has!host-node?intern/dojo/node!fs';
+import * as https from 'https';
+import * as querystring from 'querystring';
+import * as fs from 'fs';
 
 export interface TenonConfig {
 }

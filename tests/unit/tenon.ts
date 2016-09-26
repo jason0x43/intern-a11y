@@ -1,6 +1,6 @@
 import * as registerSuite from 'intern!object';
 import * as Test from 'intern/lib/Test';
-import * as tenon from 'intern/dojo/has!host-node?intern/dojo/node!../../../../../../src/tenon';
+import * as tenon from 'intern/dojo/node!../../../../../src/tenon';
 import * as fs from 'intern/dojo/has!host-node?intern/dojo/node!fs';
 import { IRequire } from 'dojo/loader';
 
