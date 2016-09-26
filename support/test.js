@@ -11,6 +11,7 @@ case 'runner':
 	shell.exec('node node_modules/intern/runner config=build/tests/intern.js');
 	break;
 case 'local':
+	shell.exec('node node_modules/intern/client config=build/tests/intern.js');
 	shell.exec('node node_modules/intern/runner config=build/tests/intern-local.js');
 	break;
 case 'all':

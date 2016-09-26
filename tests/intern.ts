@@ -1,5 +1,3 @@
-import * as intern from 'intern';
-
 export const capabilities = { name: 'intern-a11y' };
 
 export const environments = [
@@ -20,7 +18,8 @@ export const loaderOptions = {
 	]
 };
 
-export const suites = [ 'tests/unit/*' ];
+// Only load the unit test suites if we're in a Node environment
+export const suites = typeof process !== 'undefined' ? [ 'tests/unit/*' ] : [];
 
 export const functionalSuites = [ 'tests/functional/*' ];
 
