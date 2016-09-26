@@ -18,6 +18,8 @@ function scheduleBuild() {
 var watcher = chokidar.watch([
 	'src/**/*.ts',
 	'tests/**/*.ts',
+	'tests/**/*.html',
+	'tests/**/*.json',
 	'package.json'
 ]).on('ready', function () {
 	console.log('Watching...');
