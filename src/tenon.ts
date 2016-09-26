@@ -5,8 +5,6 @@ import * as fs from 'fs';
 export interface TenonConfig {
 }
 
-export type TenonSourceType = 'url' | 'file' | 'data';
-
 export interface TenonResult {
 	bpID: number,
 	certainty: number,
@@ -123,13 +121,11 @@ interface TenonQuery {
 }
 
 export interface TenonTestOptions {
+	/** An external URL, file name, or a data string */
 	source: string,
 
-	/** sourceType defaults to URL if not specified */
-	sourceType?: string,
-
 	/** tenon.io API key */
-	apiKey: string,
+	apiKey?: string,
 
 	/** filename to write report file */
 	report?: string,
@@ -144,15 +140,19 @@ export function run(options: TenonTestOptions) {
 			key: options.apiKey
 		};
 
-		switch (options.sourceType) {
-		case 'file':
-			queryData.src = fs.readFileSync(options.source, { encoding: 'utf8' });
-			break;
-		case 'data':
-			queryData.src = options.source;
-			break;
-		default:
+		const source = options.source;
+
+		if (/^https?:\/\/\S+$/.test(source)) {
+			// source is a URL
 			queryData.url = options.source;
+		}
+		else if (fileExists(source)) {
+			// source is a file name
+			queryData.src = fs.readFileSync(source, { encoding: 'utf8' });
+		}
+		else {
+			// source is raw data
+			queryData.src = source;
 		}
 
 		const data = querystring.stringify(queryData);
@@ -194,4 +194,16 @@ export function run(options: TenonTestOptions) {
 			throw new Error(totalErrors + ' a11y violations were logged');
 		}
 	});
+}
+
+function fileExists(filename: string) {
+	try {
+		return fs.statSync(filename).isFile();
+	}
+	catch (error) {
+		if (error.code === 'ENOENT') {
+			return false;
+		}
+		throw error;
+	}
 }
