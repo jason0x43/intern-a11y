@@ -187,7 +187,10 @@ export function run(options: TenonTestOptions) {
 		}
 
 		var totalErrors = report.resultSummary.issues.totalErrors;
-		if (totalErrors > 0) {
+		if (totalErrors == 1) {
+			throw new Error('1 a11y violation was logged');
+		}
+		else if (totalErrors > 1) {
 			throw new Error(totalErrors + ' a11y violations were logged');
 		}
 	});

@@ -108,8 +108,12 @@ export function createRunner(options?: AxeTestOptions) {
 							fs.writeFileSync(options.report, JSON.stringify(report, null, '  '));
 						}
 
-						if (report.violations && report.violations.length > 0) {
-							throw new Error(report.violations.length + ' a11y violations were logged');
+						var numViolations = (report.violations && report.violations.length) || 0;
+						if (numViolations == 1) {
+							throw new Error('1 a11y violation was logged');
+						}
+						else if (numViolations > 1) {
+							throw new Error(numViolations + ' a11y violations were logged');
 						}
 					})
 					.then(
