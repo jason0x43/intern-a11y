@@ -181,7 +181,12 @@ export function run(options: TenonTestOptions) {
 				responseData.push(chunk);
 			});
 			response.on('end', function () {
-				resolve(JSON.parse(responseData.join('')));
+				if (response.statusCode !== 200) {
+					reject(new Error((<any> response).statusMessage));
+				}
+				else {
+					resolve(JSON.parse(responseData.join('')));
+				}
 			});
 			response.on('error', function (error: Error) {
 				reject(error);
