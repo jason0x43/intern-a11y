@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as Command from 'leadfoot/Command';
 
-export interface AxeReport {
+export interface AxeResults {
 	url: string,
 	timestamp: string,
 	passes: AxeResult[],
@@ -9,8 +9,8 @@ export interface AxeReport {
 }
 
 export interface AxeTestOptions {
-	/** Filename to write report file to */
-	report?: string,
+	/** Filename to write results data to */
+	resultsFile?: string,
 
 	config?: {
 		branding?: {
@@ -82,28 +82,28 @@ export function createChecker(options?: AxeTestOptions) {
 							done(results);
 						});
 					}).apply(this, arguments)`, [ axeConfig ])
-					.then(function (report: AxeReport) {
-						if (options.report) {
-							fs.writeFileSync(options.report, JSON.stringify(report, null, '  '));
+					.then(function (results: AxeResults) {
+						if (options.resultsFile) {
+							fs.writeFileSync(options.resultsFile, JSON.stringify(results, null, '  '));
 						}
 
-						const numViolations = (report.violations && report.violations.length) || 0;
+						const numViolations = (results.violations && results.violations.length) || 0;
 						let error: AxeError;
 						if (numViolations == 1) {
-							error = new AxeError('1 a11y violation was logged', report);
+							error = new AxeError('1 a11y violation was logged', results);
 						}
 						if (numViolations > 1) {
-							error = new AxeError(numViolations + ' a11y violations were logged', report);
+							error = new AxeError(numViolations + ' a11y violations were logged', results);
 						}
 
 						if (error) {
 							throw error;
 						}
 
-						return report;
+						return results;
 					})
 					.then(
-						function (this: Command<void>, report: AxeReport) {
+						function (this: Command<void>, report: AxeResults) {
 							return this.parent
 								.setExecuteAsyncTimeout(timeout)
 								.then(function () {
@@ -134,7 +134,7 @@ export function check(options?: AxeRunTestOptions) {
 	}
 
 	return chain.then(createChecker({
-		report: options.report
+		resultsFile: options.resultsFile
 	}));
 }
 
@@ -167,9 +167,9 @@ interface AxeResult {
 }
 
 class AxeError extends Error {
-	report: AxeReport
+	report: AxeResults
 
-	constructor(message?: string, report?: AxeReport) {
+	constructor(message?: string, report?: AxeResults) {
 		super(message);
 		(<any> Error).captureStackTrace(this, this.constructor);
 		this.message = message;

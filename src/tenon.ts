@@ -2,7 +2,7 @@ import * as https from 'https';
 import * as querystring from 'querystring';
 import * as fs from 'fs';
 
-export interface TenonReport {
+export interface TenonResults {
 	apiErrors: any[],
 	documentSize: number,
 	globalStats: {
@@ -114,8 +114,8 @@ export interface TenonTestOptions {
 	/** tenon.io API key */
 	apiKey?: string,
 
-	/** Filename to write report file to */
-	report?: string,
+	/** Filename to write result data to */
+	resultsFile?: string,
 
 	/** Number of milliseconds to wait before starting test */
 	waitFor?: number,
@@ -191,26 +191,26 @@ export function check(options: TenonTestOptions) {
 
 		request.write(data);
 		request.end();
-	}).then(function (report: TenonReport) {
-		if (options.report) {
-			fs.writeFileSync(options.report, JSON.stringify(report, null, '  '));
+	}).then(function (results: TenonResults) {
+		if (options.resultsFile) {
+			fs.writeFileSync(options.resultsFile, JSON.stringify(results, null, '  '));
 		}
 
-		const totalErrors = report.resultSummary.issues.totalErrors;
+		const totalErrors = results.resultSummary.issues.totalErrors;
 		let error: TenonError;
 
 		if (totalErrors == 1) {
-			error = new TenonError('1 a11y violation was logged', report);
+			error = new TenonError('1 a11y violation was logged', results);
 		}
 		if (totalErrors > 1) {
-			error = new TenonError(totalErrors + ' a11y violations were logged', report);
+			error = new TenonError(totalErrors + ' a11y violations were logged', results);
 		}
 
 		if (error) {
 			throw error;
 		}
 
-		return report;
+		return results;
 	});
 }
 
@@ -246,12 +246,12 @@ interface TenonQuery extends TenonConfig {
 }
 
 class TenonError extends Error {
-	report: TenonReport
+	results: TenonResults
 
-	constructor(message?: string, report?: TenonReport) {
+	constructor(message?: string, results?: TenonResults) {
 		super(message);
 		(<any> Error).captureStackTrace(this, this.constructor);
 		this.message = message;
-		this.report = report;
+		this.results = results;
 	}
 }

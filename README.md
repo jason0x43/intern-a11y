@@ -78,8 +78,8 @@ check({
 	/** Number of milliseconds to wait before starting test */
 	waitFor?: number,
 
-	/** Filename to write report file to */
-	report?: string,
+	/** Filename to write JSON result data to */
+	resultsFile?: string,
 
 	/** aXe-specific configuration */
 	config?: Object,
@@ -93,8 +93,8 @@ The `createChecker` function returns a Leadfoot Command helper (a `then` callbac
 
 ```typescript
 createChecker({
-	/** Filename to write report file to */
-	report?: string,
+	/** Filename to write JSON result data to */
+	resultsFile?: string,
 
 	/** aXe-specific configuration */
 	config?: Object,
@@ -116,8 +116,8 @@ check({
 	/** tenon.io API key */
 	apiKey?: string,
 
-	/** Filename to write report file to */
-	report?: string,
+	/** Filename to write JSON report data to */
+	resultsFile?: string,
 
 	/** Number of milliseconds to wait before starting test */
 	waitFor?: number,

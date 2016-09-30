@@ -1,7 +1,7 @@
 import * as registerSuite from 'intern!object';
 import * as Test from 'intern/lib/Test';
 import * as assert from 'intern/chai!assert';
-import * as aXe from 'intern/dojo/node!../../../../src/aXe'
+import * as axe from 'intern/dojo/node!../../../../src/axe'
 import * as fs from 'intern/dojo/node!fs'
 import * as util from './util';
 import { IRequire } from 'dojo/loader';
@@ -12,14 +12,14 @@ registerSuite({
 	name: 'aXe',
 
 	bad: (function () {
-		function check(reportFile: string, promise: Promise<aXe.AxeReport>) {
+		function check(resultsFile: string, promise: Promise<axe.AxeResults>) {
 			return promise.then(
 				function () {
 					throw new Error('test should not have passed');
 				},
 				function (error) {
-					if (reportFile) {
-						assert.isTrue(util.fileExists(reportFile), 'expected report file to exist');
+					if (resultsFile) {
+						assert.isTrue(util.fileExists(resultsFile), 'expected report file to exist');
 					}
 				}
 			);
@@ -27,30 +27,30 @@ registerSuite({
 		
 		return {
 			Command: function (this: Test) {
-				const reportFile = util.cleanup('axe-leadfoot-bad.json');
+				const resultsFile = util.cleanup('axe-leadfoot-bad.json');
 
-				return check(reportFile, this.remote
+				return check(resultsFile, this.remote
 					.get(require.toUrl('./data/bad_page.html'))
 					.sleep(2000)
-					.then(aXe.createChecker({
-						report: reportFile
+					.then(axe.createChecker({
+						resultsFile: resultsFile
 					}))
 				);
 			},
 
 			standalone: function (this: Test) {
-				const reportFile = util.cleanup('axe-standalone-bad.json');
+				const resultsFile = util.cleanup('axe-standalone-bad.json');
 
-				return check(reportFile, aXe.check({
+				return check(resultsFile, axe.check({
 					source: require.toUrl('./data/bad_page.html'),
 					remote: this.remote,
-					report: reportFile,
+					resultsFile: resultsFile,
 					waitFor: 2000
 				}));
 			},
 
 			'missing remote': function () {
-				return check(null, aXe.check({
+				return check(null, axe.check({
 					source: require.toUrl('./data/good_page.html'),
 					remote: null
 				}));
@@ -59,32 +59,32 @@ registerSuite({
 	})(),
 
 	good: (function () {
-		function check(reportFile: string, promise: Promise<aXe.AxeReport>) {
+		function check(resultsFile: string, promise: Promise<axe.AxeResults>) {
 			return promise.then(function () {
-				assert.isTrue(util.fileExists(reportFile), 'expected report file to exist');
+				assert.isTrue(util.fileExists(resultsFile), 'expected report file to exist');
 			});
 		}
 		
 		return {
 			Command: function (this: Test) {
-				const reportFile = util.cleanup('axe-leadfoot-good.json');
+				const resultsFile = util.cleanup('axe-leadfoot-good.json');
 
-				return check(reportFile, this.remote
+				return check(resultsFile, this.remote
 					.get(require.toUrl('./data/good_page.html'))
 					.sleep(2000)
-					.then(aXe.createChecker({
-						report: reportFile
+					.then(axe.createChecker({
+						resultsFile: resultsFile
 					}))
 				);
 			},
 
 			standalone: function (this: Test) {
-				const reportFile = util.cleanup('axe-standalone-good.json');
+				const resultsFile = util.cleanup('axe-standalone-good.json');
 
-				return check(reportFile, aXe.check({
+				return check(resultsFile, axe.check({
 					source: require.toUrl('./data/good_page.html'),
 					remote: this.remote,
-					report: reportFile,
+					resultsFile: resultsFile,
 					waitFor: 2000
 				}));
 			}
