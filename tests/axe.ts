@@ -89,5 +89,15 @@ registerSuite({
 				}));
 			}
 		};
-	})()
+	})(),
+
+	reporting: function (this: Test) {
+		return axe.check({
+			source: require.toUrl('./data/bad_page.html'),
+			remote: this.remote,
+			waitFor: 2000
+		}).catch(function (error) {
+			return axe.writeHtmlReport('axe-report.html', error.results);
+		});
+	}
 });

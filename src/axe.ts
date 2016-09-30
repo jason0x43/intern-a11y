@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as Command from 'leadfoot/Command';
+import * as htmlWriter from './htmlWriter';
 
 export interface AxeResults {
 	url: string,
@@ -103,11 +104,11 @@ export function createChecker(options?: AxeTestOptions) {
 						return results;
 					})
 					.then(
-						function (this: Command<void>, report: AxeResults) {
+						function (this: Command<void>, results: AxeResults) {
 							return this.parent
 								.setExecuteAsyncTimeout(timeout)
 								.then(function () {
-									return report;
+									return results;
 								});
 						},
 						function (this: Command<void>, error: Error) {
@@ -136,6 +137,22 @@ export function check(options?: AxeRunTestOptions) {
 	return chain.then(createChecker({
 		resultsFile: options.resultsFile
 	}));
+}
+
+export function writeHtmlReport(filename: string, results: AxeResults) {
+	return htmlWriter.writeFile(filename, {
+		source: results.url,
+		violations: results.violations.map(function (violation) {
+			return {
+				message: violation.help,
+				snippet: violation.nodes[0].html,
+				description: violation.description,
+				target: violation.nodes[0].target[0],
+				reference: violation.helpUrl,
+				tags: violation.tags
+			};
+		})
+	});
 }
 
 interface AxeCheck {
@@ -167,12 +184,12 @@ interface AxeResult {
 }
 
 class AxeError extends Error {
-	report: AxeResults
+	results: AxeResults
 
-	constructor(message?: string, report?: AxeResults) {
+	constructor(message?: string, results?: AxeResults) {
 		super(message);
 		(<any> Error).captureStackTrace(this, this.constructor);
 		this.message = message;
-		this.report = report;
+		this.results = results;
 	}
 }

@@ -91,5 +91,13 @@ registerSuite({
 				});
 			}
 		};
-	})()
+	})(),
+
+	reporting: function (this: Test) {
+		return tenon.check({
+			source: 'http://google.com'
+		}).catch(function (error) {
+			return tenon.writeHtmlReport('tenon-report.html', error.results);
+		});
+	}
 });

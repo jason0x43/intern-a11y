@@ -1,6 +1,7 @@
 import * as https from 'https';
 import * as querystring from 'querystring';
 import * as fs from 'fs';
+import * as htmlWriter from './htmlWriter';
 
 export interface TenonResults {
 	apiErrors: any[],
@@ -211,6 +212,22 @@ export function check(options: TenonTestOptions) {
 		}
 
 		return results;
+	});
+}
+
+export function writeHtmlReport(filename: string, results: TenonResults) {
+	return htmlWriter.writeFile(filename, {
+		source: results.request.url,
+		violations: results.resultSet.map(function (result) {
+			return {
+				message: result.errorTitle,
+				snippet: result.errorSnippet,
+				description: result.errorDescription,
+				target: result.xpath,
+				reference: result.ref,
+				tags: result.standards
+			};
+		})
 	});
 }
 

@@ -1,5 +1,7 @@
 build/
 node_modules/
 tenon*.json
+tenon*.html
 axe*.json
+axe*.html
 intern-local.ts
