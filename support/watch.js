@@ -12,7 +12,7 @@ function scheduleBuild() {
 		console.log('Building...');
 		shell.exec('node ./support/build.js');
 		console.log('Done.');
-	}, 1000);
+	}, 500);
 }
 
 var watcher = chokidar.watch([
