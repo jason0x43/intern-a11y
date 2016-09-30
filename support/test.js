@@ -1,23 +1,36 @@
-var shell = require('shelljs');
 var args = process.argv.slice(2);
+var spawn = require('child_process').spawnSync
+var mode = 'client';
 
-var mode = args[0] || 'client';
+function run(runner, config, userArgs) {
+	spawn('node', [
+		'node_modules/intern/' + runner,
+		'config=build/tests/' + config + '.js'
+	].concat(userArgs), { stdio: 'inherit' });
+}
+
+switch (args[0]) {
+case 'client':
+case 'runner':
+case 'local':
+case 'all':
+	mode = args[0];
+	args = args.slice(1);
+	break;
+}
 
 switch (mode) {
-case 'client':
-	shell.exec('node node_modules/intern/client config=build/tests/intern.js');
-	break;
 case 'runner':
-	shell.exec('node node_modules/intern/runner config=build/tests/intern.js');
+	run('runner', 'intern', args);
 	break;
 case 'local':
-	shell.exec('node node_modules/intern/client config=build/tests/intern.js');
-	shell.exec('node node_modules/intern/runner config=build/tests/intern-local.js');
+	run('client', 'intern-local', args);
+	run('runner', 'intern-local', args);
 	break;
 case 'all':
-	shell.exec('node node_modules/intern/client config=build/tests/intern.js');
-	shell.exec('node node_modules/intern/runner config=build/tests/intern.js');
+	run('client', 'intern', args);
+	run('runner', 'intern', args);
 	break;
 default:
-	console.log('Invalid mode "' + mode + '"');
+	run('client', 'intern', args);
 }
