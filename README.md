@@ -88,7 +88,7 @@ check({
 
 	/** aXe plugin definitions */
 	plugins?: Object
-}): Promise<AxeReport>
+}): Promise<AxeResults>
 ```
 
 #### createChecker
@@ -140,7 +140,7 @@ check({
 
 	/** Tenon configuration options */
 	config?: TenonConfig
-}): Promise<TenonReport>
+}): Promise<TenonResults>
 ```
 
 #### writeHtmlReport
