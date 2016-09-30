@@ -19,7 +19,7 @@
 	"typescript": "2.0.2"
   },
   "peerDependencies": {
-    "intern": "~3.3.0"
+    "intern": "^3.3.0"
   },
   "bugs": "https://github.com/theintern/intern-a11y/issues",
   "keywords": [
