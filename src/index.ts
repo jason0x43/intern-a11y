@@ -1,2 +1,5 @@
-export * from './axe';
-export * from './tenon';
+import * as _axe from './axe';
+export let axe = _axe;
+
+import * as _tenon from './tenon';
+export let tenon = _tenon;
