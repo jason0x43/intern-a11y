@@ -19,9 +19,9 @@ export const loaderOptions = {
 };
 
 // Only load the unit test suites if we're in a Node environment
-export const suites = typeof process !== 'undefined' ? [ 'tests/unit/*' ] : [];
+export const suites = typeof process !== 'undefined' ? [ 'tests/tenon' ] : [];
 
-export const functionalSuites = [ 'tests/functional/*' ];
+export const functionalSuites = [ 'tests/tenon', 'tests/aXe' ];
 
 export const excludeInstrumentation = /(?:node_modules|bower_components|tests)[\/]/;
 
