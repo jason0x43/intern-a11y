@@ -1,64 +1,6 @@
 import * as fs from 'fs';
 import * as Command from 'leadfoot/Command';
 
-export type AxeReporterVersion = 'v1' | 'v2';
-
-export interface AxeConfig {
-	branding?: {
-		brand?: string,
-		application?: string
-	},
-	reporter?: AxeReporterVersion,
-	checks?: {
-		id: string,
-		evaluate: Function,
-		after?: Function,
-		options?: Object,
-		matches?: string,
-		enabled?: boolean
-	}[],
-	rules?: {
-		id: string,
-		selector?: string,
-		excludeHidden?: boolean,
-		enabled?: boolean,
-		pageLevel?: boolean,
-		any?: string[],
-		all?: string[],
-		none?: string[],
-		tags?: string[],
-		matches?: string
-	}[]
-}
-
-export interface AxeCheck {
-	id: string,
-	impact: string,
-	message: string,
-	data: string,
-	relatedNodes: {
-		target: string[],
-		html: string
-	}[]
-}
-
-export interface AxeResult {
-	description: string,
-	help: string,
-	helpUrl: string,
-	id: string,
-	impact: string,
-	tags: string[],
-	nodes: {
-		html: string,
-		impact: string,
-		target: string[],
-		any: AxeCheck[],
-		all: AxeCheck[],
-		none: AxeCheck[]
-	}[]
-}
-
 export interface AxeReport {
 	url: string,
 	timestamp: string,
@@ -66,23 +8,60 @@ export interface AxeReport {
 	violations: AxeResult[]
 }
 
-export interface AxePlugin {
-	id: string,
-	run: Function,
-	commands: {
+export interface AxeTestOptions {
+	/** Filename to write report file to */
+	report?: string,
+
+	config?: {
+		branding?: {
+			brand?: string,
+			application?: string
+		},
+		reporter?: 'v1' | 'v2',
+		checks?: {
+			id: string,
+			evaluate: Function,
+			after?: Function,
+			options?: Object,
+			matches?: string,
+			enabled?: boolean
+		}[],
+		rules?: {
+			id: string,
+			selector?: string,
+			excludeHidden?: boolean,
+			enabled?: boolean,
+			pageLevel?: boolean,
+			any?: string[],
+			all?: string[],
+			none?: string[],
+			tags?: string[],
+			matches?: string
+		}[]
+	},
+
+	plugins?: {
 		id: string,
-		callback: Function
+		run: Function,
+		commands: {
+			id: string,
+			callback: Function
+		}[]
 	}[]
 }
 
-export interface AxeTestOptions {
-	baseUrl?: string,
-	report?: string,
-	config?: AxeConfig,
-	plugins?: AxePlugin[]
+export interface AxeRunTestOptions extends AxeTestOptions {
+	/** LeadFoot Command object */
+	remote: Command<any>,
+
+	/** URL to load for testing */
+	source: string,
+
+	/** Number of milliseconds to wait before starting test */
+	waitFor?: number
 }
 
-export function createRunner(options?: AxeTestOptions) {
+export function createChecker(options?: AxeTestOptions) {
 	return function (this: Command<any>) {
 		options = options || {};
 		const axeConfig = options.config || null;
@@ -108,18 +87,28 @@ export function createRunner(options?: AxeTestOptions) {
 							fs.writeFileSync(options.report, JSON.stringify(report, null, '  '));
 						}
 
-						var numViolations = (report.violations && report.violations.length) || 0;
+						const numViolations = (report.violations && report.violations.length) || 0;
+						let error: AxeError;
 						if (numViolations == 1) {
-							throw new Error('1 a11y violation was logged');
+							error = new AxeError('1 a11y violation was logged', report);
 						}
-						else if (numViolations > 1) {
-							throw new Error(numViolations + ' a11y violations were logged');
+						if (numViolations > 1) {
+							error = new AxeError(numViolations + ' a11y violations were logged', report);
 						}
+
+						if (error) {
+							throw error;
+						}
+
+						return report;
 					})
 					.then(
-						function (this: Command<void>) {
+						function (this: Command<void>, report: AxeReport) {
 							return this.parent
-								.setExecuteAsyncTimeout(timeout);
+								.setExecuteAsyncTimeout(timeout)
+								.then(function () {
+									return report;
+								});
 						},
 						function (this: Command<void>, error: Error) {
 							return this.parent
@@ -130,5 +119,60 @@ export function createRunner(options?: AxeTestOptions) {
 						}
 					);
 			});
+	}
+}
+
+export function check(options?: AxeRunTestOptions) {
+	if (options.remote == null) {
+		return Promise.reject(new Error('A remote is required when calling check()'));
+	}
+
+	let chain = options.remote.get(options.source);
+
+	if (options.waitFor) {
+		chain = chain.sleep(options.waitFor);
+	}
+
+	return chain.then(createChecker({
+		report: options.report
+	}));
+}
+
+interface AxeCheck {
+	id: string,
+	impact: string,
+	message: string,
+	data: string,
+	relatedNodes: {
+		target: string[],
+		html: string
+	}[]
+}
+
+interface AxeResult {
+	description: string,
+	help: string,
+	helpUrl: string,
+	id: string,
+	impact: string,
+	tags: string[],
+	nodes: {
+		html: string,
+		impact: string,
+		target: string[],
+		any: AxeCheck[],
+		all: AxeCheck[],
+		none: AxeCheck[]
+	}[]
+}
+
+class AxeError extends Error {
+	report: AxeReport
+
+	constructor(message?: string, report?: AxeReport) {
+		super(message);
+		(<any> Error).captureStackTrace(this, this.constructor);
+		this.message = message;
+		this.report = report;
 	}
 }

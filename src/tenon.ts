@@ -2,46 +2,6 @@ import * as https from 'https';
 import * as querystring from 'querystring';
 import * as fs from 'fs';
 
-export interface TenonConfig {
-}
-
-export interface TenonResult {
-	bpID: number,
-	certainty: number,
-	errorDescription: string,
-	errorSnippet: string,
-	errorTitle: string,
-	issueID: string,
-	position: {
-		line: number,
-		column: number 
-	},
-	priority: number,
-	ref: string,
-	resultTitle: string,
-	signature: string,
-	standards: string[],
-	tID: number,
-	viewPortLocation: {
-		'bottom-right': {
-			x: number,
-			y: number 
-		},
-		'top-left': {
-			x: number,
-			y: number
-		},
-		height: number,
-		width: number
-	},
-	xpath: string
-}
-
-export interface TenonError {
-	message: string,
-	stacktrace: any[]
-}
-
 export interface TenonReport {
 	apiErrors: any[],
 	documentSize: number,
@@ -74,7 +34,37 @@ export interface TenonReport {
 	},
 	responseExecTime: string
 	responseTime: string,
-	resultSet: TenonResult[],
+	resultSet: {
+		bpID: number,
+		certainty: number,
+		errorDescription: string,
+		errorSnippet: string,
+		errorTitle: string,
+		issueID: string,
+		position: {
+			line: number,
+			column: number 
+		},
+		priority: number,
+		ref: string,
+		resultTitle: string,
+		signature: string,
+		standards: string[],
+		tID: number,
+		viewPortLocation: {
+			'bottom-right': {
+				x: number,
+				y: number 
+			},
+			'top-left': {
+				x: number,
+				y: number
+			},
+			height: number,
+			width: number
+		},
+		xpath: string
+	}[],
 	resultSummary: {
 		density: {
 			allDensity: number,
@@ -109,15 +99,12 @@ export interface TenonReport {
 	sourceHash: string,
 	status: number,
 	urlHttpCode: number,
-	clientScriptErrors: TenonError[],
+	clientScriptErrors: {
+		message: string,
+		stacktrace: any[]
+	},
 	code: string,
 	moreInfo: string
-}
-
-interface TenonQuery {
-	key: string,
-	src?: string,
-	url?: string
 }
 
 export interface TenonTestOptions {
@@ -127,13 +114,17 @@ export interface TenonTestOptions {
 	/** tenon.io API key */
 	apiKey?: string,
 
-	/** filename to write report file */
+	/** Filename to write report file to */
 	report?: string,
 
-	config?: TenonConfig,
+	/** Number of milliseconds to wait before starting test */
+	waitFor?: number,
+
+	/** Tenon configuration options */
+	config?: TenonConfig
 }
 
-export function run(options: TenonTestOptions) {
+export function check(options: TenonTestOptions) {
 	return new Promise(function (resolve, reject) {
 		const tenonConfig = options.config;
 
@@ -149,11 +140,16 @@ export function run(options: TenonTestOptions) {
 			key: apiKey
 		};
 
+		// Copy user config into queryData
+		for (let key in options.config) {
+			(<any> queryData)[key] = (<any> options.config)[key];
+		}
+
 		const source = options.source;
 
 		if (/^https?:\/\/\S+$/.test(source)) {
 			// source is a URL
-			queryData.url = options.source;
+			queryData.url = source;
 		}
 		else if (fileExists(source)) {
 			// source is a file name
@@ -200,13 +196,21 @@ export function run(options: TenonTestOptions) {
 			fs.writeFileSync(options.report, JSON.stringify(report, null, '  '));
 		}
 
-		var totalErrors = report.resultSummary.issues.totalErrors;
+		const totalErrors = report.resultSummary.issues.totalErrors;
+		let error: TenonError;
+
 		if (totalErrors == 1) {
-			throw new Error('1 a11y violation was logged');
+			error = new TenonError('1 a11y violation was logged', report);
 		}
-		else if (totalErrors > 1) {
-			throw new Error(totalErrors + ' a11y violations were logged');
+		if (totalErrors > 1) {
+			error = new TenonError(totalErrors + ' a11y violations were logged', report);
 		}
+
+		if (error) {
+			throw error;
+		}
+
+		return report;
 	});
 }
 
@@ -219,5 +223,35 @@ function fileExists(filename: string) {
 			return false;
 		}
 		throw error;
+	}
+}
+
+interface TenonConfig {
+	certainty?: 0 | 20 | 40 | 60 | 80 | 100,
+	projectID?: string,
+	docID?: string,
+	priority?: 0 | 20 | 40 | 60 | 80 | 100,
+	level?: 'A' | 'AA' | 'AAA',
+	fragment?: 0 | 1,
+	store?: 0 | 1,
+	uaString?: string,
+	viewPortHeight?: number,
+	viewPortWidth?: number,
+}
+
+interface TenonQuery extends TenonConfig {
+	key: string,
+	src?: string,
+	url?: string
+}
+
+class TenonError extends Error {
+	report: TenonReport
+
+	constructor(message?: string, report?: TenonReport) {
+		super(message);
+		(<any> Error).captureStackTrace(this, this.constructor);
+		this.message = message;
+		this.report = report;
 	}
 }
