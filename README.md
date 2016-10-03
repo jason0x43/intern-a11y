@@ -6,11 +6,11 @@ This is an intern plugin that adds support for accessibility testing.
 
 ## How it works
 
-Accessibility testing works by having a scanner check a page or page fragment for rule violations. The most commonly used rules are defined in the W3C's [Web Content Accessibility Guidelines](https://www.w3.org/WAI/intro/wcag.php) (WCAG). There are twelve general WCAG guidelines at three levels of success critera: A, AA, and AAA. Scanners can check for violations at any of the levels, and can typically be configured to only check a subset of rules.
+Accessibility testing works by having a scanner check a page or page fragment for rule violations. The most commonly used rules are defined in the W3C's [Web Content Accessibility Guidelines](https://www.w3.org/WAI/intro/wcag.php) (WCAG). There are twelve general WCAG guidelines at three levels of success criteria: A, AA, and AAA. Scanners can check for violations at any of the levels, and can typically be configured to only check a subset of rules.
 
 `intern-a11y` currently supports two scanners, [aXe](https://github.com/dequelabs/axe-core) and [Tenon](https://tenon.io). aXe is a JavaScript application that must be injected into the page being tested. The application is configured and executed, returning a report describing the test results. Tenon is a cloud-based testing service; a user requests that the service test a particular URL or page source, and the service returns a report of the results.
 
-Note that because aXe must be injected into a loaded page, it must be used with Intern's WebDriver test runner (`intern-runner`). Tenon makes HTTP calls to an external service, so it simply requires that it be used in a Node enviroment, and will work with the Node test client (`intern-client`) or `intern-runner`.
+Note that because aXe must be injected into a loaded page, it must be used with Intern's WebDriver test runner (`intern-runner`). Tenon makes HTTP calls to an external service, so it simply requires that it be used in a Node environment, and will work with the Node test client (`intern-client`) or `intern-runner`.
 
 ## Installation
 
@@ -108,7 +108,7 @@ The Tenon checker works by making requests to a remote cloud service. It can be 
 
 #### check
 
-The tenon `check` functiocn works the same way as the axe module's, and takes a similar argument object.
+The tenon `check` function works the same way as the axe module's, and takes a similar argument object.
 
 ```typescript
 check({
@@ -136,14 +136,14 @@ reporters: [
 		id: 'intern/dojo/node!../../../src/A11yReporter',
 
 		// If this is a filename, all failures will be written to the given
-		file. If / it's a directory name (no extension), each test failure
-		report will be // written to an individual file in the given directory.
+		// file. If it's a directory name (no extension), each test failure
+		// report will be written to an individual file in the given directory.
 		filename: 'somereport.html'
 	}
 ]
 ```
 
-The A11yReporter class also exposes a `writeReport` static method. This method allows tests to manually write acessibility test results to a file rather than relying on the reporter:
+The A11yReporter class also exposes a `writeReport` static method. This method allows tests to manually write accessibility test results to a file rather than relying on the reporter:
 
 ```js
 return axe.check({ ... })
