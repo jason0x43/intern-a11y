@@ -128,7 +128,9 @@ check({
 
 ### A11yReporter
 
-The A11yReporter class is an Intern reporter that will write test failure reports to a file or directory. It is configured in the same way as other Intern reporters, via a reporter configuration object in the intern Test config:
+The A11yReporter class is an Intern reporter that will write test failure detail reports to a file or directory. The `check` methods will fail if accessibility failures are present, regardless of whether the A11yReporter reporter is in use. This reporter simply outputs more detailed information for any failures that are detected.
+
+The reporter is configured in the same way as other Intern reporters, via a reporter configuration object in the intern Test config:
 
 ```js
 reporters: [
