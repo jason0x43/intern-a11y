@@ -2,6 +2,8 @@ import * as intern from 'intern';
 
 export const capabilities = { name: 'intern-a11y' };
 
+const isNode = typeof process !== 'undefined';
+
 export const environments = [
 	{ browserName: 'chrome' }
 ];
@@ -21,7 +23,7 @@ export const loaderOptions = {
 };
 
 // Only load the unit test suites if we're in a Node environment
-export const suites = [ 'tests/unit/**', 'tests/integration/tenon' ];
+export const suites = isNode ? [ 'tests/unit/**', 'tests/integration/tenon' ] : [];
 
 export const functionalSuites = [ 'tests/integration/axe' ];
 

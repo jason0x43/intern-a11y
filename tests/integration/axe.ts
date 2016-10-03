@@ -28,7 +28,7 @@ registerSuite({
 			Command(this: Test) {
 				return check(this.remote
 					.get(require.toUrl('../data/bad_page.html'))
-					.sleep(2000)
+					.sleep(1000)
 					.then(axe.createChecker())
 				);
 			},
@@ -37,7 +37,7 @@ registerSuite({
 				return check(axe.check({
 					source: require.toUrl('../data/bad_page.html'),
 					remote: this.remote,
-					waitFor: 2000
+					waitFor: 1000
 				}));
 			},
 
@@ -55,7 +55,7 @@ registerSuite({
 			Command(this: Test) {
 				return this.remote
 					.get(require.toUrl('../data/good_page.html'))
-					.sleep(2000)
+					.sleep(1000)
 					.then(axe.createChecker());
 			},
 
@@ -63,7 +63,16 @@ registerSuite({
 				return axe.check({
 					source: require.toUrl('../data/good_page.html'),
 					remote: this.remote,
-					waitFor: 2000
+					waitFor: 1000
+				});
+			},
+
+			'partial page'(this: Test) {
+				return axe.check({
+					source: require.toUrl('../data/bad_page.html'),
+					remote: this.remote,
+					waitFor: 1000,
+					context: '#heading'
 				});
 			}
 		};

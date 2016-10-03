@@ -54,14 +54,8 @@ export interface AxeTestOptions {
 		}[]
 	},
 
-	plugins?: {
-		id: string,
-		run: Function,
-		commands: {
-			id: string,
-			callback: Function
-		}[]
-	}[]
+	// The scope to be analyzed (i.e., a selector for a portion of a document); defaults to the entire document
+	context?: string
 }
 
 export interface AxeRunTestOptions extends AxeTestOptions {
@@ -89,9 +83,32 @@ export class AxeError extends Error {
 export function createChecker(options?: AxeTestOptions) {
 	return function (this: Command<any>) {
 		options = options || {};
-		const axeConfig = options.config || null;
 		const axePath = require.resolve('axe-core/axe.min')
 		const axeScript = fs.readFileSync(axePath, { encoding: 'utf8' });
+		const axeContext = options.context;
+
+		const config = options.config;
+		let axeConfig: AxeConfig = null;
+
+		if (config) {
+			axeConfig = {
+				branding: config.branding,
+				reporter: config.reporter,
+				rules: config.rules
+			};
+			if (config.checks) {
+				axeConfig.checks = config.checks.map(function (check) {
+					return {
+						id: check.id,
+						evaluate: check.evaluate.toString(),
+						after: check.after ? check.after.toString() : undefined,
+						options: check.options,
+						matches: check.matches,
+						enabled: check.enabled
+					};
+				});
+			}
+		}
 
 		return this.parent
 			.getExecuteAsyncTimeout()
@@ -99,14 +116,25 @@ export function createChecker(options?: AxeTestOptions) {
 				return this.parent
 					.setExecuteAsyncTimeout(30000)
 					.execute(axeScript, [])
-					.executeAsync(`return (function (config, done) {
+					.executeAsync(`return (function (config, context, done) {
 						if (config) {
+							if (config.checks) {
+								config.checks.forEach(function (check) {
+									eval('check.evaluate = ' + check.evaluate);
+									if (check.after) {
+										eval('check.after = ' + check.after);
+									}
+								});
+							}
 							axe.configure(config);
 						}
-						axe.a11yCheck(document, function(results) {
+						if (!context) {
+							context = document;
+						}
+						axe.a11yCheck(context, function(results) {
 							done(results);
 						});
-					}).apply(this, arguments)`, [ axeConfig ])
+					}).apply(this, arguments)`, [ axeConfig, axeContext ])
 					.then(function (results: AxeResults) {
 						const numViolations = (results.violations && results.violations.length) || 0;
 						let error: AxeError;
@@ -182,5 +210,33 @@ interface AxeResult {
 		any: AxeCheck[],
 		all: AxeCheck[],
 		none: AxeCheck[]
+	}[]
+}
+
+interface AxeConfig {
+	branding?: {
+		brand?: string,
+		application?: string
+	},
+	reporter?: 'v1' | 'v2',
+	checks?: {
+		id: string,
+		evaluate: string,
+		after?: string,
+		options?: Object,
+		matches?: string,
+		enabled?: boolean
+	}[],
+	rules?: {
+		id: string,
+		selector?: string,
+		excludeHidden?: boolean,
+		enabled?: boolean,
+		pageLevel?: boolean,
+		any?: string[],
+		all?: string[],
+		none?: string[],
+		tags?: string[],
+		matches?: string
 	}[]
 }

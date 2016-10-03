@@ -14,7 +14,7 @@ Note that because aXe must be injected into a loaded page, it must be used with 
 
 ## Installation
 
-The intern-a11y module should be installed as a peer of intern.
+The intern-a11y module should be installed as a peer of Intern.
 
 ```
 $ npm install intern
@@ -63,11 +63,11 @@ Importing the `intern-a11y` module will return an object with `tenon` and `axe` 
 
 ### axe
 
-The aXe checker must be injected into the page being analyzed, and therefore can only be used in functional test suites, which must be run Intern's WebDriver runner, `intern-runner` (or `intern run -w` with [intern-cli](https://github.com/theintern/intern-cli)). It provides two functions, `check` and `createChecker`.
+The aXe checker must be injected into the page being analyzed, and therefore can only be used in functional test suites. These must be run using Intern's WebDriver runner, `intern-runner` (or `intern run -w` with [intern-cli](https://github.com/theintern/intern-cli)). The aXe checker provides two functions, `check` and `createChecker`.
 
 #### check
 
-The `check` function performs a check on a given URL using a given Command object (typically `this.remote`).
+The `check` function performs an accessibility analysis on a given URL using a given Command object (typically `this.remote`).
 
 ```typescript
 check({
@@ -80,13 +80,17 @@ check({
 	/** Number of milliseconds to wait before starting test */
 	waitFor?: number,
 
+	/** A selector to confine analysis to */
+	context?: string
+
 	/** aXe-specific configuration */
 	config?: Object,
-
-	/** aXe plugin definitions */
-	plugins?: Object
 }): Promise<AxeResults>
 ```
+
+The two required parameters are `remote` and `source`. `remote` is a Leadfoot Command object, generally `this.remote` in a test. `source` is the URL that will be analyzed.
+
+There are three optional parameters. `waitFor` is a number of milliseconds to wait after a page has loaded before starting the accessibility analysis. `context` is a CSS selector (ID or class name) that can be used to confine analysis to a specific part of a page. The `config` paramter contains [aXe configuration options](https://github.com/dequelabs/axe-core/blob/master/doc/API.md#api-name-axeconfigure).
 
 #### createChecker
 
@@ -145,7 +149,7 @@ reporters: [
 ]
 ```
 
-The A11yReporter class also exposes a `writeReport` static method. This method allows tests to manually write accessibility test results to a file rather than relying on the reporter:
+The A11yReporter class also exposes a `writeReport` static method. This method allows accessibility test results to be explicitly written to a file rather than relying on the reporter:
 
 ```js
 return axe.check({ ... })
@@ -176,4 +180,4 @@ To run tests:
 $ npm test [mode] [arg [arg [...]]]
 ```
 
-The optional `mode` argument can be 'runner', 'client', 'all', or 'local' (it defaults to `client`). The first three modes correspond directly to Intern test runners (runner, client, or both) and use the `tests/intern` config. `local` mode will use a `tests/intern-local` config if one is present. You can also provide standard Intern arguments like 'grep=xyz'.
+The optional `mode` argument can be 'runner', 'client', 'all', or 'local' (it defaults to `client`). The first three modes correspond directly to Intern test runners (runner, client, or both) and use the `tests/intern` config. `local` mode will run both the client and runner using a `tests/intern-local` config if one is present. You can also provide standard Intern arguments like 'grep=xyz'.
