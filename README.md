@@ -80,9 +80,6 @@ check({
 	/** Number of milliseconds to wait before starting test */
 	waitFor?: number,
 
-	/** Filename to write JSON result data to */
-	resultsFile?: string,
-
 	/** aXe-specific configuration */
 	config?: Object,
 
@@ -97,23 +94,12 @@ The `createChecker` function returns a Leadfoot Command helper (a `then` callbac
 
 ```typescript
 createChecker({
-	/** Filename to write JSON result data to */
-	resultsFile?: string,
-
 	/** aXe-specific configuration */
 	config?: Object,
 
 	/** aXe plugin definitions */
 	plugins?: Object
 }): Function
-```
-
-#### writeHtmlReport
-
-The `writeHtmlReport` function writes a results object (the resolved value of `check` or `createChecker`) to a given file name.
-
-```typescript
-writeHtmlReport(filename: string, results: AxeResults)
 ```
 
 ### tenon
@@ -124,16 +110,13 @@ The Tenon checker works by making requests to a remote cloud service. It can be 
 
 The tenon `check` functiocn works the same way as the axe module's, and takes a similar argument object.
 
-```js
+```typescript
 check({
 	/** An external URL, file name, or a data string */
 	source: string,
 
 	/** tenon.io API key */
 	apiKey?: string,
-
-	/** Filename to write JSON report data to */
-	resultsFile?: string,
 
 	/** Number of milliseconds to wait before starting test */
 	waitFor?: number,
@@ -143,12 +126,31 @@ check({
 }): Promise<TenonResults>
 ```
 
-#### writeHtmlReport
+### A11yReporter
 
-The `writeHtmlReport` function writes a results object (the resolved value of `check`) to a given file name.
+The A11yReporter class is an Intern reporter that will write test failure reports to a file or directory. It is configured in the same way as other Intern reporters, via a reporter configuration object in the intern Test config:
 
-```typescript
-writeHtmlReport(filename: string, results: TenonResults)
+```js
+reporters: [
+	{
+		id: 'intern/dojo/node!../../../src/A11yReporter',
+
+		// If this is a filename, all failures will be written to the given
+		file. If / it's a directory name (no extension), each test failure
+		report will be // written to an individual file in the given directory.
+		filename: 'somereport.html'
+	}
+]
+```
+
+The A11yReporter class also exposes a `writeReport` static method. This method allows tests to manually write acessibility test results to a file rather than relying on the reporter:
+
+```js
+return axe.check({ ... })
+	.catch(function (error) {
+		var results = axe.toA11yResults(error.results);
+		return A11yReporter.writeReport('some_file.html', results);
+	})
 ```
 
 ## Development

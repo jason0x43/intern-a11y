@@ -1,7 +1,7 @@
 import * as https from 'https';
 import * as querystring from 'querystring';
 import * as fs from 'fs';
-import * as htmlWriter from './htmlWriter';
+import { A11yResults } from './interfaces';
 
 export interface TenonResults {
 	apiErrors: any[],
@@ -108,6 +108,22 @@ export interface TenonResults {
 	moreInfo: string
 }
 
+export function toA11yResults(results: TenonResults): A11yResults {
+	return {
+		source: results.request.url,
+		violations: results.resultSet.map(function (result) {
+			return {
+				message: result.errorTitle,
+				snippet: result.errorSnippet,
+				description: result.errorDescription,
+				target: result.xpath,
+				reference: result.ref,
+				tags: result.standards
+			};
+		})
+	};
+}
+
 export interface TenonTestOptions {
 	/** An external URL, file name, or a data string */
 	source: string,
@@ -115,14 +131,22 @@ export interface TenonTestOptions {
 	/** tenon.io API key */
 	apiKey?: string,
 
-	/** Filename to write result data to */
-	resultsFile?: string,
-
 	/** Number of milliseconds to wait before starting test */
 	waitFor?: number,
 
 	/** Tenon configuration options */
 	config?: TenonConfig
+}
+
+export class TenonError extends Error {
+	results: TenonResults
+
+	constructor(message?: string, results?: TenonResults) {
+		super(message);
+		(<any> Error).captureStackTrace(this, this.constructor);
+		this.message = message;
+		this.results = results;
+	}
 }
 
 export function check(options: TenonTestOptions) {
@@ -193,10 +217,6 @@ export function check(options: TenonTestOptions) {
 		request.write(data);
 		request.end();
 	}).then(function (results: TenonResults) {
-		if (options.resultsFile) {
-			fs.writeFileSync(options.resultsFile, JSON.stringify(results, null, '  '));
-		}
-
 		const totalErrors = results.resultSummary.issues.totalErrors;
 		let error: TenonError;
 
@@ -212,22 +232,6 @@ export function check(options: TenonTestOptions) {
 		}
 
 		return results;
-	});
-}
-
-export function writeHtmlReport(filename: string, results: TenonResults) {
-	return htmlWriter.writeFile(filename, {
-		source: results.request.url,
-		violations: results.resultSet.map(function (result) {
-			return {
-				message: result.errorTitle,
-				snippet: result.errorSnippet,
-				description: result.errorDescription,
-				target: result.xpath,
-				reference: result.ref,
-				tags: result.standards
-			};
-		})
 	});
 }
 
@@ -260,15 +264,4 @@ interface TenonQuery extends TenonConfig {
 	key: string,
 	src?: string,
 	url?: string
-}
-
-class TenonError extends Error {
-	results: TenonResults
-
-	constructor(message?: string, results?: TenonResults) {
-		super(message);
-		(<any> Error).captureStackTrace(this, this.constructor);
-		this.message = message;
-		this.results = results;
-	}
 }

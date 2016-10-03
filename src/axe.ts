@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as Command from 'leadfoot/Command';
-import * as htmlWriter from './htmlWriter';
+import { A11yResults } from './interfaces';
 
 export interface AxeResults {
 	url: string,
@@ -9,10 +9,23 @@ export interface AxeResults {
 	violations: AxeResult[]
 }
 
-export interface AxeTestOptions {
-	/** Filename to write results data to */
-	resultsFile?: string,
+export function toA11yResults(results: AxeResults): A11yResults {
+	return {
+		source: results.url,
+		violations: results.violations.map(function (violation) {
+			return {
+				message: violation.help,
+				snippet: violation.nodes[0].html,
+				description: violation.description,
+				target: violation.nodes[0].target[0],
+				reference: violation.helpUrl,
+				tags: violation.tags
+			};
+		})
+	}
+}
 
+export interface AxeTestOptions {
 	config?: {
 		branding?: {
 			brand?: string,
@@ -62,6 +75,17 @@ export interface AxeRunTestOptions extends AxeTestOptions {
 	waitFor?: number
 }
 
+export class AxeError extends Error {
+	results: AxeResults
+
+	constructor(message?: string, results?: AxeResults) {
+		super(message);
+		(<any> Error).captureStackTrace(this, this.constructor);
+		this.message = message;
+		this.results = results;
+	}
+}
+
 export function createChecker(options?: AxeTestOptions) {
 	return function (this: Command<any>) {
 		options = options || {};
@@ -84,10 +108,6 @@ export function createChecker(options?: AxeTestOptions) {
 						});
 					}).apply(this, arguments)`, [ axeConfig ])
 					.then(function (results: AxeResults) {
-						if (options.resultsFile) {
-							fs.writeFileSync(options.resultsFile, JSON.stringify(results, null, '  '));
-						}
-
 						const numViolations = (results.violations && results.violations.length) || 0;
 						let error: AxeError;
 						if (numViolations == 1) {
@@ -134,25 +154,7 @@ export function check(options?: AxeRunTestOptions) {
 		chain = chain.sleep(options.waitFor);
 	}
 
-	return chain.then(createChecker({
-		resultsFile: options.resultsFile
-	}));
-}
-
-export function writeHtmlReport(filename: string, results: AxeResults) {
-	return htmlWriter.writeFile(filename, {
-		source: results.url,
-		violations: results.violations.map(function (violation) {
-			return {
-				message: violation.help,
-				snippet: violation.nodes[0].html,
-				description: violation.description,
-				target: violation.nodes[0].target[0],
-				reference: violation.helpUrl,
-				tags: violation.tags
-			};
-		})
-	});
+	return chain.then(createChecker(options));
 }
 
 interface AxeCheck {
@@ -181,15 +183,4 @@ interface AxeResult {
 		all: AxeCheck[],
 		none: AxeCheck[]
 	}[]
-}
-
-class AxeError extends Error {
-	results: AxeResults
-
-	constructor(message?: string, results?: AxeResults) {
-		super(message);
-		(<any> Error).captureStackTrace(this, this.constructor);
-		this.message = message;
-		this.results = results;
-	}
 }

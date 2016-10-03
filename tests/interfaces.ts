@@ -13,3 +13,9 @@ declare module 'intern/dojo/node!https' {
 declare module 'intern/dojo/node!querystring' {
 	export * from 'querystring';
 }
+
+const shelljs = require('shelljs');
+
+declare module 'intern/dojo/node!shelljs' {
+	export = shelljs;
+}
