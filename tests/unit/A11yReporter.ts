@@ -5,8 +5,7 @@ import * as Test from 'intern/lib/Test';
 import * as fs from 'intern/dojo/node!fs'
 import * as util from '../util';
 import * as shell from 'intern/dojo/node!shelljs';
-import { A11yResults } from 'intern/dojo/node!../../../../src/interfaces';
-import { TenonError, TenonResults } from 'intern/dojo/node!../../../../../src/tenon';
+import { A11yResults, A11yError } from 'intern/dojo/node!../../../../../src/interfaces';
 
 import A11yReporter = require('intern/dojo/node!../../../../../src/A11yReporter');
 
@@ -29,7 +28,7 @@ registerSuite({
 		const data = fs.readFileSync(require.toUrl('../data/a11y_results.json'), { encoding: 'utf8' });
 		const results = <A11yResults> JSON.parse(data);
 		reportFile = '_tempreport.html';
-		return A11yReporter.writeReport(reportFile, results).then(function () {
+		return A11yReporter.writeReport(reportFile, results, 'foo').then(function () {
 			assert.isTrue(util.fileExists(reportFile));
 		});
 	},
@@ -40,13 +39,13 @@ registerSuite({
 			reportFile = '_tempreport.html';
 			const reporter = new A11yReporter({ filename: reportFile });
 
-			const data = fs.readFileSync(require.toUrl('../data/tenon_results.json'), { encoding: 'utf8' });
-			const results = <TenonResults> JSON.parse(data);
+			const data = fs.readFileSync(require.toUrl('../data/a11y_results.json'), { encoding: 'utf8' });
+			const results = <A11yResults> JSON.parse(data);
 
 			const test1 = new Test({ name: 'test1' });
 			const test2 = new Test({ name: 'test2' });
-			test1.error = new TenonError('Oops', results);
-			test2.error = new TenonError('Oops', results);
+			test1.error = new A11yError('Oops', results);
+			test2.error = new A11yError('Oops', results);
 
 			reporter.testFail(test1);
 			reporter.testFail(test2);
@@ -61,13 +60,13 @@ registerSuite({
 			reportFile = '_tempreports';
 			const reporter = new A11yReporter({ filename: reportFile });
 
-			const data = fs.readFileSync(require.toUrl('../data/tenon_results.json'), { encoding: 'utf8' });
-			const results = <TenonResults> JSON.parse(data);
+			const data = fs.readFileSync(require.toUrl('../data/a11y_results.json'), { encoding: 'utf8' });
+			const results = <A11yResults> JSON.parse(data);
 
 			const test1 = new Test({ name: 'test1' });
 			const test2 = new Test({ name: 'test2' });
-			test1.error = new TenonError('Oops', results);
-			test2.error = new TenonError('Oops', results);
+			test1.error = new A11yError('Oops', results);
+			test2.error = new A11yError('Oops', results);
 
 			reporter.testFail(test1);
 			let entries = fs.readdirSync(reportFile);

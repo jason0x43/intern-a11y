@@ -1,7 +1,7 @@
 import * as https from 'https';
 import * as querystring from 'querystring';
 import * as fs from 'fs';
-import { A11yResults } from './interfaces';
+import { A11yResults, A11yError } from './interfaces';
 
 export interface TenonResults {
 	apiErrors: any[],
@@ -109,8 +109,14 @@ export interface TenonResults {
 }
 
 export function toA11yResults(results: TenonResults): A11yResults {
+	let source = results.request.url;
+	if (/tenon\.io\/api\/file.php/.test(results.request.url)) {
+		source = `${results.request.docID} (uploaded)`;
+	}
+
 	return {
-		source: results.request.url,
+		analyzer: 'tenon',
+		source: source,
 		violations: results.resultSet.map(function (result) {
 			return {
 				message: result.errorTitle,
@@ -118,9 +124,14 @@ export function toA11yResults(results: TenonResults): A11yResults {
 				description: result.errorDescription,
 				target: result.xpath,
 				reference: result.ref,
-				tags: result.standards
+				standards: result.standards,
+				position: {
+					line: result.position.line,
+					column: result.position.column
+				}
 			};
-		})
+		}),
+		originalResults: results
 	};
 }
 
@@ -136,17 +147,6 @@ export interface TenonTestOptions {
 
 	/** Tenon configuration options */
 	config?: TenonConfig
-}
-
-export class TenonError extends Error {
-	results: TenonResults
-
-	constructor(message?: string, results?: TenonResults) {
-		super(message);
-		(<any> Error).captureStackTrace(this, this.constructor);
-		this.message = message;
-		this.results = results;
-	}
 }
 
 export function check(options: TenonTestOptions) {
@@ -218,13 +218,13 @@ export function check(options: TenonTestOptions) {
 		request.end();
 	}).then(function (results: TenonResults) {
 		const totalErrors = results.resultSummary.issues.totalErrors;
-		let error: TenonError;
+		let error: A11yError;
 
 		if (totalErrors == 1) {
-			error = new TenonError('1 a11y violation was logged', results);
+			error = new A11yError('1 a11y violation was logged', toA11yResults(results));
 		}
 		if (totalErrors > 1) {
-			error = new TenonError(totalErrors + ' a11y violations were logged', results);
+			error = new A11yError(totalErrors + ' a11y violations were logged', toA11yResults(results));
 		}
 
 		if (error) {

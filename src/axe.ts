@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as Command from 'leadfoot/Command';
-import { A11yResults } from './interfaces';
+import { A11yResults, A11yError } from './interfaces';
 
 export interface AxeResults {
 	url: string,
@@ -11,17 +11,47 @@ export interface AxeResults {
 
 export function toA11yResults(results: AxeResults): A11yResults {
 	return {
+		analyzer: 'axe',
 		source: results.url,
 		violations: results.violations.map(function (violation) {
+			let standards: string[] = [];
+			let wcagLevel = '';
+
+			if (violation.tags.indexOf('wcag2a') !== -1) {
+				wcagLevel = 'A';
+			}
+			else if (violation.tags.indexOf('wcag2aa') !== -1) {
+				wcagLevel = 'AA';
+			}
+			else if (violation.tags.indexOf('wcag2aaa') !== -1) {
+				wcagLevel = 'AAA';
+			}
+
+			// WCAG tags
+			violation.tags.filter(function (tag) {
+				return /wcag\d+$/.test(tag);
+			}).forEach(function (tag) {
+				var section = tag.slice(4).split('').join('.');
+				standards.push(`Web Content Accessibility Guidelines (WCAG) 2.0, Level ${wcagLevel}: ${section}`);
+			});
+
+			// Section 508 tags
+			violation.tags.filter(function (tag) {
+				return /section508\..*/.test(tag);
+			}).forEach(function (tag) {
+				standards.push(`Section 508: 1194.${tag.slice('section508.'.length)}`);
+			});
+
 			return {
 				message: violation.help,
 				snippet: violation.nodes[0].html,
 				description: violation.description,
 				target: violation.nodes[0].target[0],
 				reference: violation.helpUrl,
-				tags: violation.tags
+				standards: standards
 			};
-		})
+		}),
+		originalResults: results
 	}
 }
 
@@ -67,17 +97,6 @@ export interface AxeRunTestOptions extends AxeTestOptions {
 
 	/** Number of milliseconds to wait before starting test */
 	waitFor?: number
-}
-
-export class AxeError extends Error {
-	results: AxeResults
-
-	constructor(message?: string, results?: AxeResults) {
-		super(message);
-		(<any> Error).captureStackTrace(this, this.constructor);
-		this.message = message;
-		this.results = results;
-	}
 }
 
 export function createChecker(options?: AxeTestOptions) {
@@ -137,12 +156,12 @@ export function createChecker(options?: AxeTestOptions) {
 					}).apply(this, arguments)`, [ axeConfig, axeContext ])
 					.then(function (results: AxeResults) {
 						const numViolations = (results.violations && results.violations.length) || 0;
-						let error: AxeError;
+						let error: A11yError;
 						if (numViolations == 1) {
-							error = new AxeError('1 a11y violation was logged', results);
+							error = new A11yError('1 a11y violation was logged', toA11yResults(results));
 						}
 						if (numViolations > 1) {
-							error = new AxeError(numViolations + ' a11y violations were logged', results);
+							error = new A11yError(numViolations + ' a11y violations were logged', toA11yResults(results));
 						}
 
 						if (error) {

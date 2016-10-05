@@ -1,6 +1,4 @@
 import * as Test from 'intern/lib/Test';
-import * as axe from './axe';
-import * as tenon from './tenon';
 import * as path from 'path';
 import * as fs from 'fs';
 import { A11yResults, A11yViolation } from './interfaces';
@@ -38,17 +36,10 @@ class A11yReporter {
 
 	testFail(test: Test) {
 		const error = test.error;
-		let results: A11yResults;
-
-		if (error instanceof axe.AxeError) {
-			results = axe.toA11yResults(error.results);
-		}
-		else if (error instanceof tenon.TenonError) {
-			results = tenon.toA11yResults(error.results);
-		}
+		let results: A11yResults = (<any> error).a11yResults;
 
 		if (results) {
-			const content = renderResults(results);
+			const content = renderResults(results, test.id);
 
 			if (this.report) {
 				this.report.push(content);
@@ -66,9 +57,9 @@ class A11yReporter {
 		}
 	}
 
-	static writeReport(filename: string, results: A11yResults) {
+	static writeReport(filename: string, results: A11yResults, id: string) {
 		return new Promise(function (resolve, reject) {
-			const content = renderResults(results);
+			const content = renderResults(results, id);
 			fs.writeFile(filename, renderReport(content), function (error) {
 				if (error) {
 					reject(error);
@@ -86,53 +77,119 @@ function escape(string: string) {
 }
 
 function renderReport(body: string) {
-	return `<DOCTYPE! html>
+	return `<!DOCTYPE html>
 	<html lang="en">
 		<head>
 		<title>Accessibility Report</title>
 			<style>
-				html { font-family:sans-serif; }
-				.violation { border: solid 1px #bbb; width: 800px; margin-bottom: 1em; }
-				.heading { padding: 0.5em; }
-				.heading > * { margin-bottom: 0.5em; }
-				.heading > *: last-child { margin-bottom: 0; }
-				.description { font-style: italic;color: #999; }
-				.target .selector {color: #999}
-				.snippet { padding: 0.5em;margin: 0;background: #f0f0f0;overflow: auto; }
+				html { font-family:sans-serif; background:#eee; }
+				body { width:800px; padding:1em; margin:0 auto; }
+
+				section { border:solid 1px #ddd; border-radius:2px; background:white; padding:1em; margin-bottom:1em; overflow:hidden; }
+				section:last-of-type { margin-bottom:0; }
+				section > * { margin-bottom:1em; }
+				section > *:last-child { margin-bottom:0; }
+
+				h1 { margin:0; margin-bottom:0.5em; }
+				h2 { margin:0; margin-bottom:0.25em; font-size:110%; }
+				pre { border-radius:4px; padding:0.5em; margin:0; overflow:auto; color:#999; }
+
+				.violation { border-radius:2px; margin-bottom:1em; background:#f7f7f7; overflow:hidden; }
+				.violation:last-child { margin-bottom:0; }
+
+				.header > * { margin:1em 0.5em; }
+				.header > *:first-child { margin-top:0.5em; }
+
+				.description { color:#444; }
+
+				.standards ul { margin:0; }
+
+				.snippet { border-radius:0; background:#eee; }
+
+				ul.meta { padding-left:0; }
+				ul.meta li { list-style-type:none; }
+				li .label { font-weight:bold; width:5em; display:inline-block; }
+				li .label:after { content:':'; }
+
+				.when-open { display:none; }
+				.when-closed { display:block; }
+				span.when-closed { display:inline; }
+				.open .when-closed { display:none; }
+				.open .when-open { display:block; }
+				.open span.when-open { display:inline; }
+
+				.raw-results pre { padding:0.5em; background:#f5f5f5; color:#444; margin-top:0.5em; }
 			</style>
+			<script>
+				window.addEventListener('load', function () {
+					document.body.addEventListener('click', function (event) {
+						var target = event.target;
+						while (target) {
+							if (target.getAttribute('data-action') === 'toggle-open') {
+								event.preventDefault();
+								target.parentElement.classList.toggle('open');
+								return false;
+							}
+							target = target.parentElement;
+						}
+					});
+				});
+			</script>
 		</head>
 		<body>
-		${body}
+			${body}
 		</body>
 	</html>`
 }
 
-function renderResults(results: A11yResults) {
-	let out: string[] = [];
+function renderResults(results: A11yResults, id: string) {
+	let out: string[] = [ '<section class="results">' ];
 
-	if (/^https?:\/\//.test(results.source)) {
-		out.push(`<h1><a href="${results.source}">${results.source}</a></h1>`);
-	}
-	else {
-		out.push(`<h1>${results.source}</h1>`);
-	}
+	out.push(`<h1>${id}</h1>`);
+	out.push(`<ul class="meta">
+		<li><span class="label">Analyzer</span> ${results.analyzer}</li>
+		<li><span class="label">Source</span> ${results.source}</li>
+	</ul>`);
 
 	if (results.violations.length > 0) {
-		out.push('<h2>Violations</h2>');
-		return out.concat(results.violations.map(renderViolation)).join('');
+		out = out.concat(results.violations.map(renderViolation));
+	}
+	else {
+		out = out.concat('<p>No violations</p>');
 	}
 
-	return out.concat('<h2>No violations</h2>').join('');
+	out.push(`<div class="raw-results">
+		<button data-action="toggle-open"><span class="when-open">Hide</span><span class="when-closed">Show</span> raw results</button>
+		<pre class="when-open">${escape(JSON.stringify(results.originalResults, null, '  '))}</pre>
+	</div>`);
+
+	return out.concat('</section>').join('');
 }
 
 function renderViolation(violation: A11yViolation) {
+	let target = escape(violation.target);
+	if (violation.position) {
+		target += ` (${violation.position.line}:${violation.position.column})`
+	}
+
+	let standards = '';
+	if (violation.standards && violation.standards.length > 0) {
+		standards = `<div class="standards">
+			<h2>Standards</h2>
+			<ul>
+				<li>${violation.standards.join('</li><li>')}</li>
+			</ul>
+		</div>`;
+	}
+
 	return `<div class="violation">
-	<div class="heading">
-	<div class="target">Target: <span class="selector">${escape(violation.target)}</span></div>
-	<div class="message"><a href="${violation.reference}">${escape(violation.message)}</a></div>
-	<div class="description">${escape(violation.description)}</div>
-	</div>
-	<pre class="snippet">${escape(violation.snippet)}</pre>
+		<div class="header">
+			<div class="target"><h2>Target</h2><span class="selector">${target}</span></div>
+			<div class="message"><h2>Summary</h2><a href="${violation.reference}">${escape(violation.message)}</a></div>
+			<div class="description"><h2>Description</h2>${escape(violation.description)}</div>
+			${standards}
+		</div>
+		<pre class="snippet">${escape(violation.snippet)}</pre>
 	</div>`;
 }
 

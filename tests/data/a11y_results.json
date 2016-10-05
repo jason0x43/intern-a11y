@@ -1,4 +1,5 @@
 {
+  "analyzer": "tenon",
   "source": "http://google.com",
   "violations": [
     {
