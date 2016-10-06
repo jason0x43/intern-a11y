@@ -5,3 +5,5 @@ tenon*.html
 axe*.json
 axe*.html
 intern-local.ts
+a11y-report.html
+examples/ts/tests/*.js
