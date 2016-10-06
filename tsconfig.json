@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "module": "umd",
+    "moduleResolution": "node",
+    "declaration": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "removeComments": true,
@@ -8,10 +10,6 @@
     "sourceMap": true,
     "outDir": "./build"
   },
-  "files": [
-    "./node_modules/intern/typings/intern/intern.d.ts",
-    "./node_modules/intern/typings/leadfoot/leadfoot.d.ts"
-  ],
   "include": [
     "./src/**/*.ts",
     "./tests/**/*.ts"

@@ -21,7 +21,7 @@ registerSuite({
 				},
 				function (error) {
 					assert.match(error.message, /\d+ a11y violation/);
-					assert.property(error, 'results', 'expected results to be attached to error');
+					assert.property(error, 'a11yResults', 'expected results to be attached to error');
 				}
 			);
 		}

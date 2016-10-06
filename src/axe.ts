@@ -2,59 +2,6 @@ import * as fs from 'fs';
 import * as Command from 'leadfoot/Command';
 import { A11yResults, A11yError } from './interfaces';
 
-export interface AxeResults {
-	url: string,
-	timestamp: string,
-	passes: AxeResult[],
-	violations: AxeResult[]
-}
-
-export function toA11yResults(results: AxeResults): A11yResults {
-	return {
-		analyzer: 'axe',
-		source: results.url,
-		violations: results.violations.map(function (violation) {
-			let standards: string[] = [];
-			let wcagLevel = '';
-
-			if (violation.tags.indexOf('wcag2a') !== -1) {
-				wcagLevel = 'A';
-			}
-			else if (violation.tags.indexOf('wcag2aa') !== -1) {
-				wcagLevel = 'AA';
-			}
-			else if (violation.tags.indexOf('wcag2aaa') !== -1) {
-				wcagLevel = 'AAA';
-			}
-
-			// WCAG tags
-			violation.tags.filter(function (tag) {
-				return /wcag\d+$/.test(tag);
-			}).forEach(function (tag) {
-				var section = tag.slice(4).split('').join('.');
-				standards.push(`Web Content Accessibility Guidelines (WCAG) 2.0, Level ${wcagLevel}: ${section}`);
-			});
-
-			// Section 508 tags
-			violation.tags.filter(function (tag) {
-				return /section508\..*/.test(tag);
-			}).forEach(function (tag) {
-				standards.push(`Section 508: 1194.${tag.slice('section508.'.length)}`);
-			});
-
-			return {
-				message: violation.help,
-				snippet: violation.nodes[0].html,
-				description: violation.description,
-				target: violation.nodes[0].target[0],
-				reference: violation.helpUrl,
-				standards: standards
-			};
-		}),
-		originalResults: results
-	}
-}
-
 export interface AxeTestOptions {
 	config?: {
 		branding?: {
@@ -155,23 +102,25 @@ export function createChecker(options?: AxeTestOptions) {
 						});
 					}).apply(this, arguments)`, [ axeConfig, axeContext ])
 					.then(function (results: AxeResults) {
+						const a11yResults = toA11yResults(results);
+
 						const numViolations = (results.violations && results.violations.length) || 0;
 						let error: A11yError;
 						if (numViolations == 1) {
-							error = new A11yError('1 a11y violation was logged', toA11yResults(results));
+							error = new A11yError('1 a11y violation was logged', a11yResults);
 						}
 						if (numViolations > 1) {
-							error = new A11yError(numViolations + ' a11y violations were logged', toA11yResults(results));
+							error = new A11yError(numViolations + ' a11y violations were logged', a11yResults);
 						}
 
 						if (error) {
 							throw error;
 						}
 
-						return results;
+						return a11yResults;
 					})
 					.then(
-						function (this: Command<void>, results: AxeResults) {
+						function (this: Command<void>, results: A11yResults) {
 							return this.parent
 								.setExecuteAsyncTimeout(timeout)
 								.then(function () {
@@ -204,6 +153,52 @@ export function check(options?: AxeRunTestOptions) {
 	return chain.then(createChecker(options));
 }
 
+export function toA11yResults(axeResults: any): A11yResults {
+	return {
+		analyzer: 'axe',
+		source: axeResults.url,
+		violations: axeResults.violations.map(function (violation: any) {
+			let standards: string[] = [];
+			let wcagLevel = '';
+
+			if (violation.tags.indexOf('wcag2a') !== -1) {
+				wcagLevel = 'A';
+			}
+			else if (violation.tags.indexOf('wcag2aa') !== -1) {
+				wcagLevel = 'AA';
+			}
+			else if (violation.tags.indexOf('wcag2aaa') !== -1) {
+				wcagLevel = 'AAA';
+			}
+
+			// WCAG tags
+			violation.tags.filter(function (tag: any) {
+				return /wcag\d+$/.test(tag);
+			}).forEach(function (tag: any) {
+				var section = tag.slice(4).split('').join('.');
+				standards.push(`Web Content Accessibility Guidelines (WCAG) 2.0, Level ${wcagLevel}: ${section}`);
+			});
+
+			// Section 508 tags
+			violation.tags.filter(function (tag: any) {
+				return /section508\..*/.test(tag);
+			}).forEach(function (tag: any) {
+				standards.push(`Section 508: 1194.${tag.slice('section508.'.length)}`);
+			});
+
+			return {
+				message: violation.help,
+				snippet: violation.nodes[0].html,
+				description: violation.description,
+				target: violation.nodes[0].target[0],
+				reference: violation.helpUrl,
+				standards: standards
+			};
+		}),
+		originalResults: axeResults
+	}
+}
+
 interface AxeCheck {
 	id: string,
 	impact: string,
@@ -212,23 +207,6 @@ interface AxeCheck {
 	relatedNodes: {
 		target: string[],
 		html: string
-	}[]
-}
-
-interface AxeResult {
-	description: string,
-	help: string,
-	helpUrl: string,
-	id: string,
-	impact: string,
-	tags: string[],
-	nodes: {
-		html: string,
-		impact: string,
-		target: string[],
-		any: AxeCheck[],
-		all: AxeCheck[],
-		none: AxeCheck[]
 	}[]
 }
 
@@ -258,4 +236,28 @@ interface AxeConfig {
 		tags?: string[],
 		matches?: string
 	}[]
+}
+
+interface AxeResult {
+	description: string,
+	help: string,
+	helpUrl: string,
+	id: string,
+	impact: string,
+	tags: string[],
+	nodes: {
+		html: string,
+		impact: string,
+		target: string[],
+		any: AxeCheck[],
+		all: AxeCheck[],
+		none: AxeCheck[]
+	}[]
+}
+
+interface AxeResults {
+	url: string,
+	timestamp: string,
+	passes: AxeResult[],
+	violations: AxeResult[]
 }

@@ -94,7 +94,7 @@ function renderReport(body: string) {
 				h2 { margin:0; margin-bottom:0.25em; font-size:110%; }
 				pre { border-radius:4px; padding:0.5em; margin:0; overflow:auto; color:#999; }
 
-				.violation { border-radius:2px; margin-bottom:1em; background:#f7f7f7; overflow:hidden; }
+				.violation { border:solid 1px #e7e7e7; border-radius:2px; margin-bottom:1em; background:#f7f7f7; overflow:hidden; }
 				.violation:last-child { margin-bottom:0; }
 
 				.header > * { margin:1em 0.5em; }

@@ -11,7 +11,7 @@ registerSuite({
 
 	toA11yResults() {
 		const data = fs.readFileSync(require.toUrl('../data/tenon_results.json'), { encoding: 'utf8' });
-		const results = <tenon.TenonResults> JSON.parse(data);
+		const results: any = JSON.parse(data);
 		const a11yResults = tenon.toA11yResults(results);
 		assert.lengthOf(a11yResults.violations, 5, 'unexpected number of violations');
 	}

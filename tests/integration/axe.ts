@@ -1,10 +1,11 @@
 import * as registerSuite from 'intern!object';
 import * as Test from 'intern/lib/Test';
 import * as assert from 'intern/chai!assert';
-import * as axe from 'intern/dojo/node!../../../../../src/axe'
-import * as fs from 'intern/dojo/node!fs'
+import * as axe from 'intern/dojo/node!../../../../../src/axe';
+import * as fs from 'intern/dojo/node!fs';
+import { A11yResults } from 'intern/dojo/node!../../../../../src/interfaces';
 
-import A11yReporter = require('intern/dojo/node!../../../../src/A11yReporter');
+import A11yReporter = require('intern/dojo/node!../../../../../src/A11yReporter');
 
 import { IRequire } from 'dojo/loader';
 declare const require: IRequire;
@@ -13,7 +14,7 @@ registerSuite({
 	name: 'integration/aXe',
 
 	bad: (function () {
-		function check(promise: Promise<axe.AxeResults>) {
+		function check(promise: Promise<A11yResults>) {
 			return promise.then(
 				function () {
 					throw new Error('test should not have passed');
