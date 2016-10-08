@@ -1,3 +1,4 @@
+// Import intern here to load the ambient declarations
 import * as intern from 'intern';
 
 export const capabilities = { name: 'intern-a11y' };
@@ -5,7 +6,7 @@ export const capabilities = { name: 'intern-a11y' };
 const isNode = typeof process !== 'undefined';
 
 export const environments = [
-	{ browserName: 'chrome' }
+	{ browserName: 'chrome', fixSessionCapabilities: false }
 ];
 
 export const tunnel = 'SeleniumTunnel';

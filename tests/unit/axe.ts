@@ -3,8 +3,8 @@ import * as assert from 'intern/chai!assert';
 import * as axe from 'intern/dojo/node!../../../../../src/axe'
 import * as fs from 'intern/dojo/node!fs'
 import { A11yResults } from 'intern/dojo/node!../../../../../src/interfaces';
-
 import { IRequire } from 'dojo/loader';
+
 declare const require: IRequire;
 
 registerSuite({

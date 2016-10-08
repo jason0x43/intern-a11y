@@ -1,15 +1,14 @@
 import * as registerSuite from 'intern!object';
 import * as assert from 'intern/chai!assert';
-import * as Suite from 'intern/lib/Suite';
 import * as Test from 'intern/lib/Test';
 import * as fs from 'intern/dojo/node!fs'
 import * as util from '../util';
 import * as shell from 'intern/dojo/node!shelljs';
 import { A11yResults, A11yError } from 'intern/dojo/node!../../../../../src/interfaces';
+import { IRequire } from 'dojo/loader';
 
 import A11yReporter = require('intern/dojo/node!../../../../../src/A11yReporter');
 
-import { IRequire } from 'dojo/loader';
 declare const require: IRequire;
 
 let reportFile: string;
