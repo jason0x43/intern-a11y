@@ -57,6 +57,23 @@ aXe may also be used inline in a Leadfoot Command chain:
 
 In all cases, the check is asynchronous and Promise-based. If the check fails (i.e., accessibility violations are detected), the returned Promise is rejected.
 
+## Examples
+
+The repository contains two example projects that use `intern-a11y`, one written in JavaScript and one written in TypeScript.
+
+### JavaScript
+
+1. cd into `examples/js`
+2. Run `npm install`
+3. Run `TENON_API_KEY=<your key> npm test` and/or `npm test runner`
+
+### TypeScript
+
+1. cd into `examples/ts`
+2. Run `npm install`
+2. Run `npm run build`
+3. Run `TENON_API_KEY=<your key> npm test` and/or `npm test runner`
+
 ## API
 
 Importing the `intern-a11y` module will return an object with `tenon` and `axe` properties. These modules may also be individually imported as `intern-a11y/axe` and `intern-a11y/tenon`.
@@ -181,3 +198,9 @@ $ npm test [mode] [arg [arg [...]]]
 ```
 
 The optional `mode` argument can be 'runner', 'client', 'all', or 'local' (it defaults to `client`). The first three modes correspond directly to Intern test runners (runner, client, or both) and use the `tests/intern` config. `local` mode will run both the client and runner using a `tests/intern-local` config if one is present. You can also provide standard Intern arguments like 'grep=xyz'.
+
+When using `client` or when not specifying a mode, you must provide a Tenon API key to be able to run the Tenon tests.
+
+```
+$ TENON_API_KEY=<your key> npm test
+```
