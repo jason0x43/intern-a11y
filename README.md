@@ -23,7 +23,20 @@ $ npm install intern-a11y
 
 ## Getting started
 
-Using either the aXe or Tenon modules is straightforward. The simplest Tenon test looks like:
+Using either the aXe or Tenon modules is straightforward. The service modules can be accessed from the `services` property on the `intern-a11y` module.
+
+```js
+import { services } from 'intern-a11y';
+const axe = services.axe;
+```
+
+or
+
+```js
+var axe = require('intern-a11y').services.axe;
+```
+
+The simplest Tenon test looks like:
 
 ```js
 'check accessibility': function () {
@@ -156,7 +169,7 @@ The reporter is configured in the same way as other Intern reporters, via a repo
 ```js
 reporters: [
 	{
-		id: 'intern/dojo/node!../../../src/A11yReporter',
+		id: 'intern/dojo/node!intern-a11y/dist/src/A11yReporter',
 
 		// If this is a filename, all failures will be written to the given
 		// file. If it's a directory name (no extension), each test failure
