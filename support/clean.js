@@ -9,4 +9,5 @@ else {
 	shell.rm('-f', 'tenon*.html');
 	shell.rm('-f', 'axe*.json');
 	shell.rm('-f', 'axe*.html');
+	shell.rm('-f', 'intern-a11y*.tgz');
 }

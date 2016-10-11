@@ -1,4 +1,5 @@
-build/
+dist/
+intern-a11y*.tgz
 node_modules/
 tenon*.json
 tenon*.html

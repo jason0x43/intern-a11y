@@ -1,8 +1,8 @@
 {
   "name": "intern-a11y",
   "version": "0.0.1",
-  "main": "./index.js",
-  "types": "./index.d.ts",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
   "description": "Intern-a11y. An accessibility testing helper for Intern.",
   "repository": {
     "type": "git",
@@ -36,6 +36,7 @@
     "build": "node ./support/build.js",
     "clean": "node ./support/clean.js",
     "test": "node ./support/test.js",
-    "watch": "node ./support/watch.js"
+    "watch": "node ./support/watch.js",
+    "prepublish": "node ./support/prepublish.js"
   }
 }

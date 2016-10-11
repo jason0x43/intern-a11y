@@ -1,0 +1,6 @@
+.npmignore
+examples/
+src/
+tests/
+dist/tests/
+support/
