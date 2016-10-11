@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as Command from 'leadfoot/Command';
 import { A11yResults, A11yError } from './interfaces';
+import { AxeResults, toA11yResults } from './_axe';
 
 export interface AxeTestOptions {
 	config?: {
@@ -31,7 +32,10 @@ export interface AxeTestOptions {
 		}[]
 	},
 
-	// The scope to be analyzed (i.e., a selector for a portion of a document); defaults to the entire document
+	/**
+	 * The scope to be analyzed (i.e., a selector for a portion of a
+	 * document); defaults to the entire document
+	 */
 	context?: string
 }
 
@@ -153,63 +157,6 @@ export function check(options?: AxeRunTestOptions) {
 	return chain.then(createChecker(options));
 }
 
-export function toA11yResults(axeResults: any): A11yResults {
-	return {
-		analyzer: 'axe',
-		source: axeResults.url,
-		violations: axeResults.violations.map(function (violation: any) {
-			let standards: string[] = [];
-			let wcagLevel = '';
-
-			if (violation.tags.indexOf('wcag2a') !== -1) {
-				wcagLevel = 'A';
-			}
-			else if (violation.tags.indexOf('wcag2aa') !== -1) {
-				wcagLevel = 'AA';
-			}
-			else if (violation.tags.indexOf('wcag2aaa') !== -1) {
-				wcagLevel = 'AAA';
-			}
-
-			// WCAG tags
-			violation.tags.filter(function (tag: any) {
-				return /wcag\d+$/.test(tag);
-			}).forEach(function (tag: any) {
-				var section = tag.slice(4).split('').join('.');
-				standards.push(`Web Content Accessibility Guidelines (WCAG) 2.0, Level ${wcagLevel}: ${section}`);
-			});
-
-			// Section 508 tags
-			violation.tags.filter(function (tag: any) {
-				return /section508\..*/.test(tag);
-			}).forEach(function (tag: any) {
-				standards.push(`Section 508: 1194.${tag.slice('section508.'.length)}`);
-			});
-
-			return {
-				message: violation.help,
-				snippet: violation.nodes[0].html,
-				description: violation.description,
-				target: violation.nodes[0].target[0],
-				reference: violation.helpUrl,
-				standards: standards
-			};
-		}),
-		originalResults: axeResults
-	}
-}
-
-interface AxeCheck {
-	id: string,
-	impact: string,
-	message: string,
-	data: string,
-	relatedNodes: {
-		target: string[],
-		html: string
-	}[]
-}
-
 interface AxeConfig {
 	branding?: {
 		brand?: string,
@@ -236,28 +183,4 @@ interface AxeConfig {
 		tags?: string[],
 		matches?: string
 	}[]
-}
-
-interface AxeResult {
-	description: string,
-	help: string,
-	helpUrl: string,
-	id: string,
-	impact: string,
-	tags: string[],
-	nodes: {
-		html: string,
-		impact: string,
-		target: string[],
-		any: AxeCheck[],
-		all: AxeCheck[],
-		none: AxeCheck[]
-	}[]
-}
-
-interface AxeResults {
-	url: string,
-	timestamp: string,
-	passes: AxeResult[],
-	violations: AxeResult[]
 }
