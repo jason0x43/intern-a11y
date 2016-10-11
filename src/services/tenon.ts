@@ -1,7 +1,7 @@
 import * as https from 'https';
 import * as querystring from 'querystring';
 import * as fs from 'fs';
-import { A11yResults, A11yError } from './interfaces';
+import { A11yResults, A11yError } from '../common';
 import { TenonResults, toA11yResults, fileExists } from './_tenon';
 
 export interface TenonConfig {

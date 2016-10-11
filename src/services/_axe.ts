@@ -3,7 +3,7 @@
  * It is is not meant to be loaded directly by end users.
  */
 
-import { A11yResults } from './interfaces';
+import { A11yResults } from '../common';
 
 export interface AxeCheck {
 	id: string,

@@ -2,13 +2,15 @@ define([
 	'require',
 	'intern!object',
 	'intern/chai!assert',
-	'intern/dojo/node!intern-a11y/aXe'
+	'intern/dojo/node!intern-a11y'
 ], function (
 	require,
 	registerSuite,
 	assert,
-	axe
+	a11y
 ) {
+	var axe = a11y.services.axe;
+
 	registerSuite({
 		name: 'aXe',
 

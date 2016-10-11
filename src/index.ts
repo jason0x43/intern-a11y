@@ -1,7 +1,12 @@
-import * as _axe from './axe';
-export let axe = _axe;
+import * as _axe from './services/axe';
+import * as _tenon from './services/tenon';
 
-import * as _tenon from './tenon';
-export let tenon = _tenon;
+export const services = {
+	axe: _axe,
+	tenon: _tenon 
+};
 
-export * from './interfaces';
+import _A11yReporter = require('./A11yReporter');
+export let A11yReporter = _A11yReporter;
+
+export * from './common';

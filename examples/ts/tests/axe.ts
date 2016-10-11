@@ -1,9 +1,11 @@
-import * as axe from 'intern-a11y/axe';
+import { services } from 'intern-a11y';
 import * as Test from 'intern/lib/Test';
 import * as path from 'path';
 import { assert } from 'chai';
 import { TestModuleInit } from './interfaces';
 import { IRequire } from 'dojo/loader';
+
+const axe = services.axe;
 
 declare const require: IRequire;
 

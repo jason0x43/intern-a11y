@@ -4,7 +4,7 @@ import * as Test from 'intern/lib/Test';
 import * as fs from 'intern/dojo/node!fs'
 import * as util from '../util';
 import * as shell from 'intern/dojo/node!shelljs';
-import { A11yResults, A11yError } from 'intern/dojo/node!../../../../../src/interfaces';
+import { A11yResults, A11yError } from 'intern/dojo/node!../../../../../src/common';
 import { IRequire } from 'dojo/loader';
 
 import A11yReporter = require('intern/dojo/node!../../../../../src/A11yReporter');

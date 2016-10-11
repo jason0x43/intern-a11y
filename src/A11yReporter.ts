@@ -1,7 +1,7 @@
 import * as Test from 'intern/lib/Test';
 import * as path from 'path';
 import * as fs from 'fs';
-import { A11yResults, A11yViolation } from './interfaces';
+import { A11yResults, A11yViolation } from './common';
 
 class A11yReporter {
 	config: any;

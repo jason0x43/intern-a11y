@@ -5,7 +5,7 @@ var mode = 'node';
 function run(runner, config, userArgs) {
 	spawn('node', [
 		'node_modules/intern/' + runner,
-		'config=build/tests/' + config + '.js'
+		'config=dist/tests/' + config + '.js'
 	].concat(userArgs), { stdio: 'inherit' });
 }
 

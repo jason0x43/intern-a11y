@@ -1,7 +1,9 @@
-import * as tenon from 'intern-a11y/tenon';
+import { services } from 'intern-a11y';
 import * as path from 'path';
 import { assert } from 'chai';
 import { TestModuleInit } from './interfaces';
+
+const tenon = services.tenon;
 
 export const init: TestModuleInit = function (registerSuite) {
 	registerSuite({

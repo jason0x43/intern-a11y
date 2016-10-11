@@ -1,9 +1,9 @@
 import * as registerSuite from 'intern!object';
 import * as Test from 'intern/lib/Test';
 import * as assert from 'intern/chai!assert';
-import * as axe from 'intern/dojo/node!../../../../../src/axe';
+import * as axe from 'intern/dojo/node!../../../../../src/services/axe';
 import * as fs from 'intern/dojo/node!fs';
-import { A11yResults } from 'intern/dojo/node!../../../../../src/interfaces';
+import { A11yResults } from 'intern/dojo/node!../../../../../src/common';
 
 import A11yReporter = require('intern/dojo/node!../../../../../src/A11yReporter');
 
@@ -19,8 +19,9 @@ registerSuite({
 				function () {
 					throw new Error('test should not have passed');
 				},
-				function () {
-					// consume error
+				function (error) {
+					assert.match(error.message, /\d+ a11y violation/);
+					assert.property(error, 'a11yResults', 'expected results to be attached to error');
 				}
 			);
 		}

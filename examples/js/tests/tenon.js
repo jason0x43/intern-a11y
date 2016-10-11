@@ -2,13 +2,15 @@ define([
 	'require',
 	'intern!object',
 	'intern/chai!assert',
-	'intern/dojo/node!intern-a11y/tenon'
+	'intern/dojo/node!intern-a11y'
 ], function (
 	require,
 	registerSuite,
 	assert,
-	tenon
+	a11y
 ) {
+	var tenon = a11y.services.tenon;
+
 	registerSuite({
 		name: 'tenon',
 

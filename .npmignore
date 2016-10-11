@@ -4,3 +4,4 @@ src/
 tests/
 dist/tests/
 support/
+tsconfig.json

@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as Command from 'leadfoot/Command';
-import { A11yResults, A11yError } from './interfaces';
+import { A11yResults, A11yError } from '../common';
 import { AxeResults, toA11yResults } from './_axe';
 
 export interface AxeTestOptions {
