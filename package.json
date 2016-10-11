@@ -18,7 +18,7 @@
     "chokidar": "1.6.0",
     "intern": "theintern/intern",
 	"shelljs": "0.7.4",
-	"typescript": "2.0.2"
+	"typescript": "^2.0.0"
   },
   "peerDependencies": {
     "intern": "^3.3.0"
