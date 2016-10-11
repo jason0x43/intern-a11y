@@ -191,15 +191,23 @@ Output will be generated in the `build/` directory. To clean up, run
 $ npm run clean
 ```
 
+To _really_ clean things up, run
+
+```
+$ npm run clean all
+```
+
+This will remove everything that's not tracked by git, with the exception of `tests/intern-local.ts`.
+
 To run tests:
 
 ```
 $ npm test [mode] [arg [arg [...]]]
 ```
 
-The optional `mode` argument can be 'runner', 'client', 'all', or 'local' (it defaults to `client`). The first three modes correspond directly to Intern test runners (runner, client, or both) and use the `tests/intern` config. `local` mode will run both the client and runner using a `tests/intern-local` config if one is present. You can also provide standard Intern arguments like 'grep=xyz'.
+The optional `mode` argument can be 'node', 'webdriver', 'all', or 'local'. The default is `node`. The first three modes correspond directly to Intern test runners ("node" = "client", "webdriver" = "runner", or both) and use the `tests/intern` config. `local` mode will run both the node and WebDriver tests using a `tests/intern-local` config if one is present. You can also provide standard Intern arguments like 'grep=xyz'.
 
-When using `client` or when not specifying a mode, you must provide a Tenon API key to be able to run the Tenon tests.
+When using `node` or when not specifying a mode, you must provide a Tenon API key to be able to run the Tenon tests.
 
 ```
 $ TENON_API_KEY=<your key> npm test
