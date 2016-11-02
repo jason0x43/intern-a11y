@@ -7,15 +7,15 @@ import { A11yResults } from '../common';
 import * as fs from 'fs';
 
 export interface TenonResults {
-	apiErrors: any[],
-	documentSize: number,
+	apiErrors: any[];
+	documentSize: number;
 	globalStats: {
 		errorDensity: string,
 		warningDensity: string,
 		allDensity: string,
 		stdDev: string
-	},
-	message: string,
+	};
+	message: string;
 	request: {
 		url: string,
 		ref: string,
@@ -35,9 +35,9 @@ export interface TenonResults {
 			height: number,
 			width: number
 		}
-	},
-	responseExecTime: string
-	responseTime: string,
+	};
+	responseExecTime: string;
+	responseTime: string;
 	resultSet: {
 		bpID: number,
 		certainty: number,
@@ -47,8 +47,8 @@ export interface TenonResults {
 		issueID: string,
 		position: {
 			line: number,
-			column: number 
-		},
+			column: number
+		};
 		priority: number,
 		ref: string,
 		resultTitle: string,
@@ -58,7 +58,7 @@ export interface TenonResults {
 		viewPortLocation: {
 			'bottom-right': {
 				x: number,
-				y: number 
+				y: number
 			},
 			'top-left': {
 				x: number,
@@ -68,7 +68,7 @@ export interface TenonResults {
 			width: number
 		},
 		xpath: string
-	}[],
+	}[];
 	resultSummary: {
 		density: {
 			allDensity: number,
@@ -83,15 +83,15 @@ export interface TenonResults {
 		issuesByLevel: {
 			A: {
 				count: number,
-				pct: number 
+				pct: number
 			},
 			AA: {
 				count: number,
-				pct: number 
+				pct: number
 			}
 			AAA: {
 				count: number,
-				pct: number 
+				pct: number
 			}
 		},
 		tests: {
@@ -99,16 +99,16 @@ export interface TenonResults {
 			passing: number,
 			total: number
 		}
-	},
-	sourceHash: string,
-	status: number,
-	urlHttpCode: number,
+	};
+	sourceHash: string;
+	status: number;
+	urlHttpCode: number;
 	clientScriptErrors: {
 		message: string,
 		stacktrace: any[]
-	},
-	code: string,
-	moreInfo: string
+	};
+	code: string;
+	moreInfo: string;
 }
 
 export function toA11yResults(tenonResults: TenonResults): A11yResults {

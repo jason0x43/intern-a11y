@@ -6,23 +6,23 @@
 import { A11yResults } from '../common';
 
 export interface AxeCheck {
-	id: string,
-	impact: string,
-	message: string,
-	data: string,
+	id: string;
+	impact: string;
+	message: string;
+	data: string;
 	relatedNodes: {
 		target: string[],
 		html: string
-	}[]
+	}[];
 }
 
 export interface AxeResult {
-	description: string,
-	help: string,
-	helpUrl: string,
-	id: string,
-	impact: string,
-	tags: string[],
+	description: string;
+	help: string;
+	helpUrl: string;
+	id: string;
+	impact: string;
+	tags: string[];
 	nodes: {
 		html: string,
 		impact: string,
@@ -30,14 +30,14 @@ export interface AxeResult {
 		any: AxeCheck[],
 		all: AxeCheck[],
 		none: AxeCheck[]
-	}[]
+	}[];
 }
 
 export interface AxeResults {
-	url: string,
-	timestamp: string,
-	passes: AxeResult[],
-	violations: AxeResult[]
+	url: string;
+	timestamp: string;
+	passes: AxeResult[];
+	violations: AxeResult[];
 }
 
 export function toA11yResults(axeResults: AxeResults): A11yResults {
@@ -84,5 +84,5 @@ export function toA11yResults(axeResults: AxeResults): A11yResults {
 			};
 		}),
 		originalResults: axeResults
-	}
+	};
 }

@@ -1,5 +1,7 @@
 // Import intern here to load the ambient declarations
+// tslint:disable
 import * as intern from 'intern';
+// tslint:enable
 
 export const capabilities = { name: 'intern-a11y' };
 

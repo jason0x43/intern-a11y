@@ -3,7 +3,6 @@ import * as Test from 'intern/lib/Test';
 import * as assert from 'intern/chai!assert';
 import * as tenon from 'intern/dojo/node!../../../../../src/services/tenon';
 import * as fs from 'intern/dojo/node!fs';
-import * as util from '../util';
 
 import { IRequire } from 'dojo/loader';
 declare const require: IRequire;

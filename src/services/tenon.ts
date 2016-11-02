@@ -1,40 +1,38 @@
 import * as https from 'https';
 import * as querystring from 'querystring';
 import * as fs from 'fs';
-import { A11yResults, A11yError } from '../common';
+import { A11yError, A11yResults } from '../common';
 import { TenonResults, toA11yResults, fileExists } from './_tenon';
 
 export interface TenonConfig {
-	certainty?: 0 | 20 | 40 | 60 | 80 | 100,
-	projectID?: string,
-	docID?: string,
-	priority?: 0 | 20 | 40 | 60 | 80 | 100,
-	level?: 'A' | 'AA' | 'AAA',
-	fragment?: 0 | 1,
-	store?: 0 | 1,
-	uaString?: string,
-	viewPortHeight?: number,
-	viewPortWidth?: number,
+	certainty?: 0 | 20 | 40 | 60 | 80 | 100;
+	projectID?: string;
+	docID?: string;
+	priority?: 0 | 20 | 40 | 60 | 80 | 100;
+	level?: 'A' | 'AA' | 'AAA';
+	fragment?: 0 | 1;
+	store?: 0 | 1;
+	uaString?: string;
+	viewPortHeight?: number;
+	viewPortWidth?: number;
 }
 
 export interface TenonTestOptions {
 	/** An external URL, file name, or a data string */
-	source: string,
+	source: string;
 
 	/** tenon.io API key */
-	apiKey?: string,
+	apiKey?: string;
 
 	/** Number of milliseconds to wait before starting test */
-	waitFor?: number,
+	waitFor?: number;
 
 	/** Tenon configuration options */
-	config?: TenonConfig
+	config?: TenonConfig;
 }
 
 export function check(options: TenonTestOptions) {
 	return new Promise(function (resolve, reject) {
-		const tenonConfig = options.config;
-
 		let apiKey = process.env['TENON_API_KEY'];
 		if (!apiKey && options.apiKey) {
 			apiKey = options.apiKey;
@@ -98,12 +96,12 @@ export function check(options: TenonTestOptions) {
 
 		request.write(data);
 		request.end();
-	}).then(function (results: TenonResults) {
+	}).then(function (results: TenonResults): A11yResults {
 		const a11yResults = toA11yResults(results);
 		const totalErrors = results.resultSummary.issues.totalErrors;
 		let error: A11yError;
 
-		if (totalErrors == 1) {
+		if (totalErrors === 1) {
 			error = new A11yError('1 a11y violation was logged', a11yResults);
 		}
 		if (totalErrors > 1) {
@@ -119,7 +117,7 @@ export function check(options: TenonTestOptions) {
 }
 
 interface TenonQuery extends TenonConfig {
-	key: string,
-	src?: string,
-	url?: string
+	key: string;
+	src?: string;
+	url?: string;
 }

@@ -30,30 +30,30 @@ export interface AxeTestOptions {
 			tags?: string[],
 			matches?: string
 		}[]
-	},
+	};
 
 	/**
 	 * The scope to be analyzed (i.e., a selector for a portion of a
 	 * document); defaults to the entire document
 	 */
-	context?: string
+	context?: string;
 }
 
 export interface AxeRunTestOptions extends AxeTestOptions {
 	/** LeadFoot Command object */
-	remote: Command<any>,
+	remote: Command<any>;
 
 	/** URL to load for testing */
-	source: string,
+	source: string;
 
 	/** Number of milliseconds to wait before starting test */
-	waitFor?: number
+	waitFor?: number;
 }
 
 export function createChecker(options?: AxeTestOptions) {
 	return function (this: Command<any>) {
 		options = options || {};
-		const axePath = require.resolve('axe-core/axe.min')
+		const axePath = require.resolve('axe-core/axe.min');
 		const axeScript = fs.readFileSync(axePath, { encoding: 'utf8' });
 		const axeContext = options.context;
 
@@ -110,7 +110,7 @@ export function createChecker(options?: AxeTestOptions) {
 
 						const numViolations = (results.violations && results.violations.length) || 0;
 						let error: A11yError;
-						if (numViolations == 1) {
+						if (numViolations === 1) {
 							error = new A11yError('1 a11y violation was logged', a11yResults);
 						}
 						if (numViolations > 1) {
@@ -140,7 +140,7 @@ export function createChecker(options?: AxeTestOptions) {
 						}
 					);
 			});
-	}
+	};
 }
 
 export function check(options?: AxeRunTestOptions) {
@@ -161,8 +161,8 @@ interface AxeConfig {
 	branding?: {
 		brand?: string,
 		application?: string
-	},
-	reporter?: 'v1' | 'v2',
+	};
+	reporter?: 'v1' | 'v2';
 	checks?: {
 		id: string,
 		evaluate: string,
@@ -170,7 +170,7 @@ interface AxeConfig {
 		options?: Object,
 		matches?: string,
 		enabled?: boolean
-	}[],
+	}[];
 	rules?: {
 		id: string,
 		selector?: string,
@@ -182,5 +182,5 @@ interface AxeConfig {
 		none?: string[],
 		tags?: string[],
 		matches?: string
-	}[]
+	}[];
 }

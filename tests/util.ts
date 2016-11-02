@@ -1,4 +1,4 @@
-import * as fs from 'intern/dojo/node!fs'
+import * as fs from 'intern/dojo/node!fs';
 
 export function cleanup(filename: string) {
 	try {

@@ -1,9 +1,7 @@
 import * as registerSuite from 'intern!object';
 import * as assert from 'intern/chai!assert';
-import * as axe from 'intern/dojo/node!../../../../../src/services/axe'
-import * as fs from 'intern/dojo/node!fs'
-import { AxeResults, toA11yResults } from 'intern/dojo/node!../../../../../src/services/_axe'
-import { A11yResults } from 'intern/dojo/node!../../../../../src/common';
+import * as fs from 'intern/dojo/node!fs';
+import { toA11yResults } from 'intern/dojo/node!../../../../../src/services/_axe';
 import { IRequire } from 'dojo/loader';
 
 declare const require: IRequire;

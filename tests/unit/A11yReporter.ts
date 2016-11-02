@@ -1,7 +1,7 @@
 import * as registerSuite from 'intern!object';
 import * as assert from 'intern/chai!assert';
 import * as Test from 'intern/lib/Test';
-import * as fs from 'intern/dojo/node!fs'
+import * as fs from 'intern/dojo/node!fs';
 import * as util from '../util';
 import * as shell from 'intern/dojo/node!shelljs';
 import { A11yResults, A11yError } from 'intern/dojo/node!../../../../../src/common';

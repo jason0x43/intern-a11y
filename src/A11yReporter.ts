@@ -45,7 +45,7 @@ class A11yReporter {
 				this.report.push(content);
 			}
 			else {
-				const filename = path.join(this.filename, sanitizeFilename(test.id + '.html')); 
+				const filename = path.join(this.filename, sanitizeFilename(test.id + '.html'));
 				fs.writeFileSync(filename, renderReport(content));
 			}
 		}
@@ -72,8 +72,8 @@ class A11yReporter {
 	}
 }
 
-function escape(string: string) {
-	return String(string).replace(/</g, '&lt;');
+function escape(str: string) {
+	return String(str).replace(/</g, '&lt;');
 }
 
 function renderReport(body: string) {
@@ -139,7 +139,7 @@ function renderReport(body: string) {
 		<body>
 			${body}
 		</body>
-	</html>`
+	</html>`;
 }
 
 function renderResults(results: A11yResults, id: string) {
@@ -169,7 +169,7 @@ function renderResults(results: A11yResults, id: string) {
 function renderViolation(violation: A11yViolation) {
 	let target = escape(violation.target);
 	if (violation.position) {
-		target += ` (${violation.position.line}:${violation.position.column})`
+		target += ` (${violation.position.line}:${violation.position.column})`;
 	}
 
 	let standards = '';
